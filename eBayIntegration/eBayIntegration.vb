@@ -7,7 +7,7 @@ Module eBayIntegration
         Logger.LogInfo("eBayIntegration starting up")
 
         Dim ebayApi As New ebayAPI
-        'ebayApi.GetUserInformation()
+        ebayApi.GetUserInformation()
         ebayApi.ListItem()
 
         Dim databaseAccess As New DatabaseAccess
