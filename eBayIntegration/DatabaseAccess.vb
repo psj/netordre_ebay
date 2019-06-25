@@ -21,6 +21,7 @@ Public Class DatabaseAccess
                   ,[lang44]
                   ,[interntnr]
               FROM [testAntik].[dbo].[eBayEmner]"
+
         sqlConnection.Open()
 
         Return sqlCommand.ExecuteReader()
