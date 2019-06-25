@@ -4,20 +4,20 @@ Imports System.Data.SqlClient
 Module eBayIntegration
 
     Sub Main()
-        Dim ebayAuthentication As EbayAuthentication = New EbayAuthentication
+        Logger.LogInfo("eBayIntegration starting up")
 
-        Dim databaseAccess As DatabaseAccess
+        Dim ebayApi As New ebayAPI
+        'ebayApi.GetUserInformation()
+        ebayApi.ListItem()
+
+        Dim databaseAccess As New DatabaseAccess
         Dim sqlDataReader As SqlDataReader
-        Dim results As String
+        Dim results As String = String.Empty
 
-        results = String.Empty
-        databaseAccess = New DatabaseAccess
         sqlDataReader = databaseAccess.FetchRowsToExport()
-
         Do While sqlDataReader.Read()
-            results = results & sqlDataReader.GetString(0) & vbTab
+            results = results & sqlDataReader.GetInt32(0).ToString() & ";" & sqlDataReader.GetInt32(1) & ";"
         Loop
-
     End Sub
 
 End Module

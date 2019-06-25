@@ -9,8 +9,8 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("eBayIntegration")>
-<Assembly: AssemblyDescription("")>
-<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyDescription("This executable will synchronize data to eBay using API access.")>
+<Assembly: AssemblyCompany("Netordre ApS")>
 <Assembly: AssemblyProduct("eBayIntegration")>
 <Assembly: AssemblyCopyright("Copyright ©  2019")>
 <Assembly: AssemblyTrademark("")>

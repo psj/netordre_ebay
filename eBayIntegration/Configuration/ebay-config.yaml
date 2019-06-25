@@ -1,9 +1,9 @@
 ﻿name: ebay-config
 api.sandbox.ebay.com:
-    appid: <appid-for-sandbox>
-    certid: <certid-from-developer-portal>
-    devid: <devid-from-developer-portal>
-    redirecturi: <redirect_uri-from-developer-portal>
+    appid: PeterSan-netordre-SBX-b72546526-42adaf33
+    certid: 8a4cc7c2-2bfb-477a-8f8d-1cc394fcbfc0
+    devid: SBX-72546526270d-6d10-4d7d-b970-db8a
+    redirecturi: http://test.ebay.antikvitet.net/
 Api.ebay.com:
     appid: <appid-from-developer-portal>
     certid: <certid-from-developer-portal>
