@@ -2,19 +2,49 @@
 Imports eBay.Service.Core.Sdk
 Imports eBay.Service.Core.Soap
 Imports eBay.Service.Util
+Imports eBay.Service.EPS
 
 Public Class ebayAPI
     Private apiContext As ApiContext = Nothing
     Private ApiServerUrl As String = "https://api.sandbox.ebay.com/wsapi"
-    Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**Lc4RXQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZWBpgudj6x9nY+seQ**DAcFAA**AAMAAA**KTUMnytC+yo0/wWROqYZY8Wa8PS3IBBd+QUoL34FbmhJyH5ZqqkXnmeST9YuxYzRsMOGes0brqiKl8bSe7Hf/V8xfOP9+Tgk5UG40wJ74BHrdR06hmlJMivpeDxJ32ggWiOQ0Y3rzEKnnR/b+Z/41K7Rf4zn9BY8VIUlzY5TLXNlcjhyEWSeeRPyM+MpgWZWjPTv0cDvx8PYNmFu7H8eVbDXx0anxtpPh53huUXFpEUsmxTowwOCsYKMj/Xpm9FjTVcr5viBWOSSwrL/JJPOTOgYNf9KxnQOCqRFgUECBlr5JbS5yOGl4AA1QcNx82WYDWeHsH5caL4KxuSfr+jLOV+7hD4RJHLklNFXsHysb1RJAfx25dJ+zbzHcbtf8YEfYxfrI746hwy1LzLw0xL6J/3Li1GiABVcFTSGXP/qvuqiPzG3ZSUid/LNdScOXviIwQy9A2mkdgcEhGKN3NZVS19SO2s3G2QIn2VqrZ41M1OAVfttlgZFhhk9fCHb1Clmi59V18quGyugunSsBQk3Wd/4MT7WdSo4qWHgT+3vNipWkYIRBe6V8vHR+p0Zk/W1ujzpToPUrWfihw+qzwEDnabkZxsHw31qF3D/agU81rOQNI1sMm5jyM99Fe4x8bzkqZzafkhfvhj38FzzszM2vInC+eGmUFnZYxVd7aAmoIhab2fyWxtuXVloxIkF0jcInc4Ytxysn6Z/31Ln1MCQpAhEOTE1yysDEryvYkNlP4tLfnNFI9MN/kCYxu9Lv8/t"
+
+    ' testuser ??
+    'Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**CojZXA**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZKFoQydj6x9nY+seQ**7/4EAA**AAMAAA**saEELQopmdyEDeta6ILFQHmzZG9lK8nwKD57KDJHv49DCHEb96nEkqAnpuslD+Wuv/R55NXHE1UXqpj6C/yzglgNaaK13Bd2wNV/Gy//Ydh/ZEuRs1jtgURFw+rEfj/0fFRhXQH+XFPeUhfRmAkQRC7RKw/RcBP7i63y/LVa3KMDQmEhFrHK8+uDk+L+guT948IAHpWck+iN65WozrxU6TmqQ3tk6ZCWQXjNw4hYFJRi19HSI43MuBvRi0wV8hg7evaCu5WCPSNY2cTZbv5BagLIRGcD6h8dCCUotakEfqIun0qexnuAigeaNvLo8Cneoz5WNV7ZYbr/ynZelNDTSpUANDpNrAN2tsirWBThYI3RU/XYJgZUrN8Z7d1wPSpbnKfVfrSvtzkAdnh64mMz1sxUlPUwcVhZHWsa69EBk9sIkqXjbtq5ERxhzgbx2DqwK1foUAf6X7+W5a2/wsF24ERq3Dg1pyPtXe0+pXI6Mp6iNuG9onsLOx2lPw53GsBerPD2hFKh6nxB8m7tTUPagz1ti5Eg8GOpsmHIlq5mNX/ZgOc4nxnimMhyCgErtFCsdEYOeBP9wuUoz2v6hc/7OAc0Ax5j3Ev8yXbkW9cwSKEHzIP4yH22tZue6pKsVIYRk1Z2bHOynIrbkFi5tPztyGyPFkAcUhZertXWG4LtnPkJR/CjRuPsY9ekP3vs6f22nRn03/qQDy/o4GIQWtFzS4+qfUpPLmYIJ1KDck45dLUNu8oZsc5VWkJjSyrQgUQr"
+    ' testuser_petersandager
+    Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**H6glXQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZWEpAqdj6x9nY+seQ**DAcFAA**AAMAAA**EINwVuiMOj7p00p81bbVXgnbFO4JAPtp0rxdLYfIerKxFyl0IJIVfti1LPT9Ogqgcg/51W7YIFJHCwrQS3sedOr5/Ed5iZBoe8MCLSDPbyvWutPNoTpSRCBx5MJVm0ZYp9PLTLiFNW5gZOReAtIO9RkbHr3g8gB1pMkVj4X+vUOPKZxX+u3uT0SsZTZxw5UUGMnxnrUn0coyzSr7MOZWk3l/150Uu5Z7xuJf/iLVMN+fZoHD2tpA48P719IJqv2qokvapWrViDMZhv6lEKhf4dyExyReKnwdbdRKAB4uTChywFClp2h173u5kEEKMVlDqH0CwempMn1EhOnrNBk0FCdNZXIiPmryWx5DsU4Y/XDf5s7pX68ArCdKWOn0XBtHEX0jjgsRfnFNIgJlX+/f9kBtnKGFv511DDvYPb/A5gKbxdZMIK4Tleg6CskTeRY7gOO7UCjNBSKFbrqjEVw3i1dI4X5dn9Cu1FrtRrpwJcoaFPhXcyjf2WRX3O7Qlr7XBbjx4nXSTDC/h9v89SdWroXiRZzCOm5NwoJio2yCJXj3G2le/dzefnnTQJxpQ6t4A2DP1NSplMiLLEq5bk++URwVjikVWHCJHsqVLvljhhlHTaFBXDpQavOdn+9trCuw668ch6cRpjAAasRWW3Y6xFZK9I/hZh6jDoV9FqlFTPrwjl9Ma/RjSjB44Kw5eay9M4ZbJmH9Lgz2251v/zqDIW1qU+v6zmArxoJ5+CYb/nfmcWQphjBHKg/XQdwGbNEL"
+
+    'testuser ??
+    'Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**eDYaXQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZWEpAqdj6x9nY+seQ**DAcFAA**AAMAAA**EINwVuiMOj7p00p81bbVXgnbFO4JAPtp0rxdLYfIerKxFyl0IJIVfti1LPT9Ogqgcg/51W7YIFJHCwrQS3sedOr5/Ed5iZBoe8MCLSDPbyvWutPNoTpSRCBx5MJVm0ZYp9PLTLiFNW5gZOReAtIO9RkbHr3g8gB1pMkVj4X+vUOPKZxX+u3uT0SsZTZxw5UUGMnxnrUn0coyzSr7MOZWk3l/150Uu5Z7xuJf/iLVMN+fZoHD2tpA48P719IJqv2qokvapWrViDMZhv6lEKhf4dyExyReKnwdbdRKAB4uTChywFClp2h173u5kEEKMVlDqH0CwempMn1EhOnrNBk0FCdNZXIiPmryWx5DsU4Y/XDf5s7pX68ArCdKWOn0XBtHEX0jjgsRfnFNIgJlX+/f9kBtnKGFv511DDvYPb/A5gKbxdZMIK4Tleg6CskTeRY7gOO7UCjNBSKFbrqjEVw3i1dI4X5dn9Cu1FrtRrpwJcoaFPhXcyjf2WRX3O7Qlr7XBbjx4nXSTDC/h9v89SdWroXiRZzCOm5NwoJio2yCJXj3G2le/dzefnnTQJxpQ6t4A2DP1NSplMiLLEq5bk++URwVjikVWHCJHsqVLvljhhlHTaFBXDpQavOdn+9trCuw668ch6cRpjAAasRWW3Y6xFZK9I/hZh6jDoV9FqlFTPrwjl9Ma/RjSjB44Kw5eay9M4ZbJmH9Lgz2251v/zqDIW1qU+v6zmArxoJ5+CYb/nfmcWQphjBHKg/XQdwGbNEL"
 
     Public Sub New()
         GetApiContext()
     End Sub
 
-    Public Sub ListItem()
+    Public Sub GetCategoriesAndUpdateDatabase()
         Try
-            Dim item As ItemType = BuildItem()
+            Dim apiCall As GetCategoriesCall = New GetCategoriesCall(apiContext)
+            apiCall.DetailLevelList.Add(DetailLevelCodeType.ReturnAll)
+            apiCall.Execute()
+
+            Dim databaseAccess As New DatabaseAccess
+            Dim categories As CategoryTypeCollection = apiCall.GetCategories()
+            Dim category As CategoryType
+
+            For Each category In categories
+                If category.CategoryLevel = 1 Or category.CategoryLevel = 0 Then
+                    Console.WriteLine(category.CategoryID.ToString + ", " + category.CategoryLevel.ToString + ", " + category.CategoryName)
+                End If
+                databaseAccess.InsertOrUpdateCategory(category.BestOfferEnabled, category.AutoPayEnabled, category.CategoryID, category.CategoryLevel, category.CategoryName, category.CategoryParentID(0))
+            Next category
+
+        Catch ex As Exception
+            Console.WriteLine("Failed to get categories : " + ex.Message)
+        End Try
+    End Sub
+
+    Public Sub ListItem(binr As Integer, CategoryId As Integer, SubCategoryId As Integer, title As String, description As String, price As Integer, zoom As Boolean, ItemLocationCity As String, ItemLocationCountry As String)
+        Try
+            Dim item As ItemType = BuildItem(binr, CategoryId, SubCategoryId, title, description, price, zoom, ItemLocationCity, ItemLocationCountry)
 
             Dim apiCall As AddFixedPriceItemCall = New AddFixedPriceItemCall(apiContext)
             Dim fees As FeeTypeCollection = apiCall.AddFixedPriceItem(item)
@@ -31,77 +61,114 @@ Public Class ebayAPI
             Console.WriteLine(String.Format("Listing fee is: {0}", listingFee))
             Console.WriteLine(String.Format("Listed Item ID: {0}", item.ItemID))
         Catch ex As Exception
-            Console.WriteLine("Failed to get user data : " + ex.Message)
+            Console.WriteLine("Failed to list item : " + ex.Message)
         End Try
 
     End Sub
 
-    Private Function BuildItem() As ItemType
+    Private Function BuildItem(binr As Integer, CategoryId As Integer, SubCategoryId As Integer, title As String, description As String, price As Integer, zoom As Boolean, ItemLocationCity As String, ItemLocationCountry As String) As ItemType
         Dim item As ItemType = New ItemType()
+        item.Title = title
+        item.Description = description
 
-        item.Title = "Test Item"
-        item.Description = "eBay SDK sample test item"
+        item.BuyerGuaranteePrice = NewAmount(price)
+        item.StartPrice = NewAmount(price)
 
         item.ListingType = ListingTypeCodeType.FixedPriceItem
-        item.Currency = CurrencyCodeType.GBP
-        item.ListingDuration = "Days_3"
-        item.Location = "Hedehusene"
+        item.Currency = CurrencyCodeType.USD
+        item.ListingDuration = "GTC"
+        item.Location = ItemLocationCity
         item.Country = CountryCodeType.DK
+        'ItemLocationCountry
 
-        Dim category As CategoryType = New CategoryType()
-        category.CategoryID = "4174"
+        Dim category As CategoryType = New CategoryType With {
+            .CategoryID = CategoryId.ToString
+        }
+
         item.PrimaryCategory = category
 
-        item.PaymentMethods = New BuyerPaymentMethodCodeTypeCollection()
-        item.PaymentMethods.Add(BuyerPaymentMethodCodeType.PayPal)
-        item.PayPalEmailAddress = "me@ebay.com"
+        If Not SubCategoryId = 0 Then
+            Dim subCategory As CategoryType = New CategoryType With {
+                .CategoryID = SubCategoryId.ToString
+            }
+            item.SecondaryCategory = subCategory
+        End If
+
+        item.PaymentMethods = New BuyerPaymentMethodCodeTypeCollection From {
+            BuyerPaymentMethodCodeType.PayPal
+        }
+        item.PayPalEmailAddress = "me@paypal.com"
 
         item.DispatchTimeMax = 1
         item.ShippingDetails = BuildShippingDetails()
 
-        item.ReturnPolicy = New ReturnPolicyType()
-        item.ReturnPolicy.ReturnsAcceptedOption = "ReturnsAccepted"
+        item.ReturnPolicy = New ReturnPolicyType With {
+            .ReturnsAcceptedOption = "ReturnsAccepted",
+            .ReturnsWithin = 30
+        }
+
+        item.PictureDetails = New PictureDetailsType With {
+            .PhotoDisplaySpecified = True,
+            .PhotoDisplay = PhotoDisplayCodeType.None,
+            .PictureURL = New StringCollection()
+        }
+
+        If zoom = True Then
+            item.PictureDetails.PictureURL.Add("https://www.antikvitet.net/images/apzoom/" & binr & "z.jpg")
+        Else
+            item.PictureDetails.PictureURL.Add("https://www.antikvitet.net/images/antLarge/" & binr & ".jpg")
+        End If
 
         Return item
     End Function
 
+    Private Function BuildItemSpecifics() As NameValueListTypeCollection
+        ' create the content of item specifics
+        Dim nvCollection As NameValueListTypeCollection = New NameValueListTypeCollection()
+        Dim nv1 As NameValueListType = New NameValueListType()
+        nv1.Name = "Media"
+        Dim nv1Col As StringCollection = New StringCollection()
+        Dim strArr1() As String = {"DVD"}
+        nv1Col.AddRange(strArr1)
+        nv1.Value = nv1Col
+        Dim nv2 As NameValueListType = New NameValueListType()
+        nv2.Name = "OS"
+        Dim nv2Col As StringCollection = New StringCollection()
+        Dim strArr2() As String = {"Windows"}
+        nv2Col.AddRange(strArr2)
+        nv2.Value = nv2Col
+        nvCollection.Add(nv1)
+        nvCollection.Add(nv2)
+        Return nvCollection
+    End Function
+
     Private Function BuildShippingDetails() As ShippingDetailsType
-        Dim shipping_details As ShippingDetailsType = New ShippingDetailsType()
+        Dim shippingDetails As ShippingDetailsType = New ShippingDetailsType With {
+            .ShippingType = ShippingTypeCodeType.Flat
+        }
 
-        shipping_details.ApplyShippingDiscount = True
+        'shippingOptions.ShippingInsuranceCost = NewAmount(1)
+        Dim shippingOptionsWorldwide As ShippingServiceOptionsType = New ShippingServiceOptionsType With {
+            .ShippingService = ShippingServiceCodeType.ShippingMethodStandard.ToString(),
+            .ShippingServiceCost = NewAmount(30),
+            .ShippingServicePriority = 1,
+            .LocalPickupSpecified = True,
+            .LocalPickup = True
+        }
 
-        Dim amount As AmountType = New AmountType()
-        amount.Value = 30
-        amount.currencyID = CurrencyCodeType.GBP
-        shipping_details.PaymentInstructions = "eBay .Net SDK test instruction."
+        Dim shippingOptionsLocalPickup As ShippingServiceOptionsType = New ShippingServiceOptionsType With {
+            .ShippingService = ShippingServiceCodeType.Pickup.ToString(),
+            .ShippingServiceCost = NewAmount(0),
+            .LocalPickupSpecified = True,
+            .LocalPickup = True
+        }
 
-        shipping_details.ShippingType = ShippingTypeCodeType.Flat
-        shipping_details.ShippingServiceUsed = ShippingServiceCodeType.UK_RoyalMailStandardParcel
+        shippingDetails.ShippingServiceOptions = New ShippingServiceOptionsTypeCollection From {
+            shippingOptionsWorldwide,
+            shippingOptionsLocalPickup
+        }
 
-        'Dim shippingOptions As ShippingServiceOptionsType = New ShippingServiceOptionsType()
-        'shippingOptions.ShippingService = ShippingServiceCodeType.UK_RoyalMailStandardParcel
-
-        'amount = New AmountType()
-        'amount.Value = 2
-        'amount.currencyID = CurrencyCodeType.GBP
-        'shippingOptions.ShippingServiceAdditionalCost = amount
-
-        'amount = New AmountType()
-        'amount.Value = 100
-        'amount.currencyID = CurrencyCodeType.GBP
-        'shippingOptions.ShippingServiceCost = amount
-        'shippingOptions.ShippingServicePriority = 1
-
-        'amount = New AmountType()
-        'amount.Value = 25
-        'amount.currencyID = CurrencyCodeType.GBP
-        'shippingOptions.ShippingInsuranceCost = amount
-
-        'shipping_details.ShippingServiceOptions = New ShippingServiceOptionsTypeCollection()
-        'shipping_details.ShippingServiceOptions.Add(shippingOptions)
-
-        Return shipping_details
-
+        Return shippingDetails
     End Function
 
     Public Sub GetUserInformation()
@@ -139,7 +206,7 @@ Public Class ebayAPI
     End Sub
 
     Private Function GetApiContext() As ApiContext
-        If (ApiContext IsNot Nothing) Then
+        If (apiContext IsNot Nothing) Then
             Return apiContext
         End If
 
@@ -149,7 +216,7 @@ Public Class ebayAPI
         apiContext = New ApiContext With {
             .SoapApiServerUrl = ApiServerUrl,
             .ApiCredential = apiCredential,
-            .Site = SiteCodeType.UK,
+            .Site = SiteCodeType.US,
             .ApiLogManager = New ApiLogManager
         }
 
@@ -160,4 +227,10 @@ Public Class ebayAPI
         Return apiContext
     End Function
 
+    Private Function NewAmount(amount As Integer) As AmountType
+        Dim amountType As AmountType = New AmountType()
+        amountType.Value = amount
+        amountType.currencyID = CurrencyCodeType.USD
+        Return amountType
+    End Function
 End Class
