@@ -17,9 +17,19 @@ Public Class DatabaseAccess
     Public Sub InsertOrUpdateCategory(BestOfferEnabled As Boolean, AutoPayEnabled As Boolean, CategoryID As Integer, CategoryLevel As Integer, CategoryName As String, CategoryParentID As Integer)
         Dim sanitizedCategoryName = CategoryName.Replace("'", "''")
         Dim commandText As String = "INSERT INTO [testAntik].[dbo].[eBayKat] ([BestOfferEnabled], [AutoPayEnabled], [CategoryID], [CategoryLevel], [CategoryName], [CategoryParentID]) VALUES (" & ConvertBooleanToIntString(BestOfferEnabled) & "," & ConvertBooleanToIntString(AutoPayEnabled) & "," & CategoryID.ToString & "," & CategoryLevel.ToString & ",'" & sanitizedCategoryName & "'," & CategoryParentID.ToString & ")"
+        ExecuteNonQuery(commandText)
+    End Sub
 
+    Public Sub InsertCategorySpecific(CategoryId As Integer, Name As String, Mandatory As Boolean, ValueType As String, ValueRecommendations As String)
+        Dim sanitizedName = Name.Replace("'", "''")
+        Dim sanitizedValueRecommendations = ValueRecommendations.Replace("'", "''")
+        Dim commandText As String = "INSERT INTO [testAntik].[dbo].[eBayItemSpecificDefinitions] ([CategoryId], [name], [mandatory], [valueType], [valueRecommendations]) VALUES (" & CategoryId.ToString & ",'" & sanitizedName & "'," & ConvertBooleanToIntString(Mandatory) & "," & ValueType & ",'" & sanitizedValueRecommendations & "')"
+        ExecuteNonQuery(commandText)
+    End Sub
+
+    Private Sub ExecuteNonQuery(CommandText As String)
         sqlCommand = sqlConnection.CreateCommand
-        sqlCommand.CommandText = commandText
+        sqlCommand.CommandText = CommandText
         sqlCommand.ExecuteNonQuery()
     End Sub
 
@@ -36,7 +46,7 @@ Public Class DatabaseAccess
         sqlCommand.CommandText = "
             SELECT EMNER.[kunr]
                   ,EMNER.[binr]
-                  ,EMNER.[eBayCategoryId]
+                  ,EMNER.[Expr1]
                   ,EMNER.[eBayCategoryId2]
                   ,EMNER.[antalEkstraFoto]
                   ,EMNER.[pris]
@@ -52,6 +62,18 @@ Public Class DatabaseAccess
              WHERE EMNER.[binr] = UPDATE_TABLE.[binr]
                AND UPDATE_TABLE.[eBayUpd] = 1
                AND UPDATE_TABLE.[eBayRettetDD] IS NULL"
+
+        Return sqlCommand.ExecuteReader()
+    End Function
+
+    Public Function FetchItemSpecifics(binr As Integer) As SqlDataReader
+        sqlCommand = sqlConnection.CreateCommand
+        sqlCommand.CommandText = "
+            SELECT [text]
+                  ,[customField]
+              FROM [testAntik].[dbo].[eBayItemSpecifics]
+             WHERE [binr] = " & binr & "
+               AND type = 'specific'"
 
         Return sqlCommand.ExecuteReader()
     End Function

@@ -7,6 +7,7 @@ Module eBayIntegration
         Dim ebayApi As New ebayAPI
         'ebayApi.GetCategoriesAndUpdateDatabase()
         'ebayApi.GetUserInformation()
+        'ebayApi.GetCategorySpecifics()
 
         Dim databaseAccess As New DatabaseAccess
         Dim sqlDataReader As SqlDataReader
@@ -25,8 +26,6 @@ Module eBayIntegration
                 ItemLocationCity(sqlDataReader),
                 ItemLocationCountry(sqlDataReader)
             )
-
-            Exit Do
         Loop
     End Sub
 
@@ -55,7 +54,11 @@ Module eBayIntegration
     End Function
 
     Function Price(row As SqlDataReader) As Integer
-        Return row.GetInt32(5)
+        Try
+            Return row.GetInt32(5)
+        Catch ex As Exception
+            Return 0
+        End Try
     End Function
 
     Function Zoom(row As SqlDataReader) As Boolean

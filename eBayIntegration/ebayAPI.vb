@@ -3,6 +3,8 @@ Imports eBay.Service.Core.Sdk
 Imports eBay.Service.Core.Soap
 Imports eBay.Service.Util
 Imports eBay.Service.EPS
+Imports System.DateTime
+Imports System.Data.SqlClient
 
 Public Class ebayAPI
     Private apiContext As ApiContext = Nothing
@@ -10,6 +12,7 @@ Public Class ebayAPI
 
     ' testuser ??
     'Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**CojZXA**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZKFoQydj6x9nY+seQ**7/4EAA**AAMAAA**saEELQopmdyEDeta6ILFQHmzZG9lK8nwKD57KDJHv49DCHEb96nEkqAnpuslD+Wuv/R55NXHE1UXqpj6C/yzglgNaaK13Bd2wNV/Gy//Ydh/ZEuRs1jtgURFw+rEfj/0fFRhXQH+XFPeUhfRmAkQRC7RKw/RcBP7i63y/LVa3KMDQmEhFrHK8+uDk+L+guT948IAHpWck+iN65WozrxU6TmqQ3tk6ZCWQXjNw4hYFJRi19HSI43MuBvRi0wV8hg7evaCu5WCPSNY2cTZbv5BagLIRGcD6h8dCCUotakEfqIun0qexnuAigeaNvLo8Cneoz5WNV7ZYbr/ynZelNDTSpUANDpNrAN2tsirWBThYI3RU/XYJgZUrN8Z7d1wPSpbnKfVfrSvtzkAdnh64mMz1sxUlPUwcVhZHWsa69EBk9sIkqXjbtq5ERxhzgbx2DqwK1foUAf6X7+W5a2/wsF24ERq3Dg1pyPtXe0+pXI6Mp6iNuG9onsLOx2lPw53GsBerPD2hFKh6nxB8m7tTUPagz1ti5Eg8GOpsmHIlq5mNX/ZgOc4nxnimMhyCgErtFCsdEYOeBP9wuUoz2v6hc/7OAc0Ax5j3Ev8yXbkW9cwSKEHzIP4yH22tZue6pKsVIYRk1Z2bHOynIrbkFi5tPztyGyPFkAcUhZertXWG4LtnPkJR/CjRuPsY9ekP3vs6f22nRn03/qQDy/o4GIQWtFzS4+qfUpPLmYIJ1KDck45dLUNu8oZsc5VWkJjSyrQgUQr"
+
     ' testuser_petersandager
     Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**H6glXQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZWEpAqdj6x9nY+seQ**DAcFAA**AAMAAA**EINwVuiMOj7p00p81bbVXgnbFO4JAPtp0rxdLYfIerKxFyl0IJIVfti1LPT9Ogqgcg/51W7YIFJHCwrQS3sedOr5/Ed5iZBoe8MCLSDPbyvWutPNoTpSRCBx5MJVm0ZYp9PLTLiFNW5gZOReAtIO9RkbHr3g8gB1pMkVj4X+vUOPKZxX+u3uT0SsZTZxw5UUGMnxnrUn0coyzSr7MOZWk3l/150Uu5Z7xuJf/iLVMN+fZoHD2tpA48P719IJqv2qokvapWrViDMZhv6lEKhf4dyExyReKnwdbdRKAB4uTChywFClp2h173u5kEEKMVlDqH0CwempMn1EhOnrNBk0FCdNZXIiPmryWx5DsU4Y/XDf5s7pX68ArCdKWOn0XBtHEX0jjgsRfnFNIgJlX+/f9kBtnKGFv511DDvYPb/A5gKbxdZMIK4Tleg6CskTeRY7gOO7UCjNBSKFbrqjEVw3i1dI4X5dn9Cu1FrtRrpwJcoaFPhXcyjf2WRX3O7Qlr7XBbjx4nXSTDC/h9v89SdWroXiRZzCOm5NwoJio2yCJXj3G2le/dzefnnTQJxpQ6t4A2DP1NSplMiLLEq5bk++URwVjikVWHCJHsqVLvljhhlHTaFBXDpQavOdn+9trCuw668ch6cRpjAAasRWW3Y6xFZK9I/hZh6jDoV9FqlFTPrwjl9Ma/RjSjB44Kw5eay9M4ZbJmH9Lgz2251v/zqDIW1qU+v6zmArxoJ5+CYb/nfmcWQphjBHKg/XQdwGbNEL"
 
@@ -67,6 +70,10 @@ Public Class ebayAPI
     End Sub
 
     Private Function BuildItem(binr As Integer, CategoryId As Integer, SubCategoryId As Integer, title As String, description As String, price As Integer, zoom As Boolean, ItemLocationCity As String, ItemLocationCountry As String) As ItemType
+        If price = 0 Then
+            Throw New System.Exception("Price cannot be 0")
+        End If
+
         Dim item As ItemType = New ItemType()
         item.Title = title
         item.Description = description
@@ -78,8 +85,9 @@ Public Class ebayAPI
         item.Currency = CurrencyCodeType.USD
         item.ListingDuration = "GTC"
         item.Location = ItemLocationCity
-        item.Country = CountryCodeType.DK
-        'ItemLocationCountry
+
+        Dim CountryCodeTranslator As CountryCodePolicy = New CountryCodePolicy
+        item.Country = CountryCodeTranslator.TranslateCountryCodeToId(ItemLocationCountry)
 
         Dim category As CategoryType = New CategoryType With {
             .CategoryID = CategoryId.ToString
@@ -119,26 +127,31 @@ Public Class ebayAPI
             item.PictureDetails.PictureURL.Add("https://www.antikvitet.net/images/antLarge/" & binr & ".jpg")
         End If
 
+        item.ItemSpecifics = BuildItemSpecifics(binr)
+
         Return item
     End Function
 
-    Private Function BuildItemSpecifics() As NameValueListTypeCollection
-        ' create the content of item specifics
+    Private Function BuildItemSpecifics(binr As Integer) As NameValueListTypeCollection
+        Dim databaseAccess As New DatabaseAccess
+        Dim sqlDataReader As SqlDataReader
+        Dim results As String = String.Empty
+
         Dim nvCollection As NameValueListTypeCollection = New NameValueListTypeCollection()
-        Dim nv1 As NameValueListType = New NameValueListType()
-        nv1.Name = "Media"
-        Dim nv1Col As StringCollection = New StringCollection()
-        Dim strArr1() As String = {"DVD"}
-        nv1Col.AddRange(strArr1)
-        nv1.Value = nv1Col
-        Dim nv2 As NameValueListType = New NameValueListType()
-        nv2.Name = "OS"
-        Dim nv2Col As StringCollection = New StringCollection()
-        Dim strArr2() As String = {"Windows"}
-        nv2Col.AddRange(strArr2)
-        nv2.Value = nv2Col
-        nvCollection.Add(nv1)
-        nvCollection.Add(nv2)
+        sqlDataReader = databaseAccess.FetchItemSpecifics(binr)
+        Do While sqlDataReader.Read()
+            Dim specificsText As String = sqlDataReader.GetString(0)
+
+            Dim nameValueListType As NameValueListType = New NameValueListType()
+            nameValueListType.Name = specificsText.Split(",").First
+
+            Dim nvStringCollection As StringCollection = New StringCollection()
+            Dim stringArray() As String = {specificsText.Split(",").Last}
+            nvStringCollection.AddRange(stringArray)
+            nameValueListType.Value = nvStringCollection
+            nvCollection.Add(nameValueListType)
+        Loop
+
         Return nvCollection
     End Function
 
@@ -170,6 +183,51 @@ Public Class ebayAPI
 
         Return shippingDetails
     End Function
+
+    Public Sub GetCategorySpecifics()
+        Dim mandatorySpecific As Boolean
+        Dim databaseAccess As New DatabaseAccess
+
+        Dim apiCall As GetCategorySpecificsCall = New GetCategorySpecificsCall(apiContext)
+        Dim categoryIdList As StringCollection = New StringCollection From {
+            "23"
+        }
+
+        Dim emptyCollection As CategoryItemSpecificsTypeCollection = New CategoryItemSpecificsTypeCollection
+        Dim lastYear As DateTime = DateTime.Today.AddYears(-1)
+        Dim categorySpecifics As RecommendationsTypeCollection
+        categorySpecifics = apiCall.GetCategorySpecifics(categoryIdList)
+        'categorySpecifics = apiCall.GetCategorySpecifics(categoryIdList, lastYear, 1000, 100, String.Empty, emptyCollection, False, False, False)
+
+        Dim categorySpecific As RecommendationsType
+        Dim nameRecommendation As NameRecommendationType
+        Dim valueRecommendation As ValueRecommendationType
+        Dim valueRecommendations As String
+
+        For Each categorySpecific In categorySpecifics
+            For Each nameRecommendation In categorySpecific.NameRecommendation
+                Console.WriteLine(nameRecommendation.Name)
+                If nameRecommendation.ValidationRules.MinValues > 0 Then
+                    mandatorySpecific = True
+                Else
+                    mandatorySpecific = False
+                End If
+
+                valueRecommendations = String.Empty
+                For Each valueRecommendation In nameRecommendation.ValueRecommendation
+                    If valueRecommendations = String.Empty Then
+                        valueRecommendations = valueRecommendation.Value
+                    Else
+                        valueRecommendations += "," + valueRecommendation.Value
+                    End If
+                Next valueRecommendation
+
+                databaseAccess.InsertCategorySpecific(23, nameRecommendation.Name, mandatorySpecific, nameRecommendation.ValidationRules.ValueType, valueRecommendations)
+
+            Next nameRecommendation
+
+        Next categorySpecific
+    End Sub
 
     Public Sub GetUserInformation()
         Try
