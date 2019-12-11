@@ -11,7 +11,6 @@ Module eBayIntegration
 
         Dim databaseAccess As New DatabaseAccess
         Dim sqlDataReader As SqlDataReader
-        Dim results As String = String.Empty
 
         sqlDataReader = databaseAccess.FetchRowsToExport()
         Do While sqlDataReader.Read()

@@ -28,9 +28,10 @@ Public Class DatabaseAccess
     End Sub
 
     Private Sub ExecuteNonQuery(CommandText As String)
-        sqlCommand = sqlConnection.CreateCommand
-        sqlCommand.CommandText = CommandText
-        sqlCommand.ExecuteNonQuery()
+        Dim nonQuerySqlCommand As SqlCommand
+        nonQuerySqlCommand = sqlConnection.CreateCommand
+        nonQuerySqlCommand.CommandText = CommandText
+        nonQuerySqlCommand.ExecuteNonQuery()
     End Sub
 
     Private Function ConvertBooleanToIntString(booleanValue As Boolean) As String
@@ -46,7 +47,7 @@ Public Class DatabaseAccess
         sqlCommand.CommandText = "
             SELECT EMNER.[kunr]
                   ,EMNER.[binr]
-                  ,EMNER.[Expr1]
+                  ,EMNER.[eBayCategoryId]
                   ,EMNER.[eBayCategoryId2]
                   ,EMNER.[antalEkstraFoto]
                   ,EMNER.[pris]
@@ -62,6 +63,15 @@ Public Class DatabaseAccess
              WHERE EMNER.[binr] = UPDATE_TABLE.[binr]
                AND UPDATE_TABLE.[eBayUpd] = 1
                AND UPDATE_TABLE.[eBayRettetDD] IS NULL"
+
+        Return sqlCommand.ExecuteReader()
+    End Function
+
+    Public Function FetchCategoryIds() As SqlDataReader
+        sqlCommand = sqlConnection.CreateCommand
+        sqlCommand.CommandText = "
+            SELECT [CategoryID]
+              FROM [testAntik].[dbo].[eBayKat]"
 
         Return sqlCommand.ExecuteReader()
     End Function

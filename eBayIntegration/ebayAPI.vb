@@ -74,17 +74,16 @@ Public Class ebayAPI
             Throw New System.Exception("Price cannot be 0")
         End If
 
-        Dim item As ItemType = New ItemType()
-        item.Title = title
-        item.Description = description
-
-        item.BuyerGuaranteePrice = NewAmount(price)
-        item.StartPrice = NewAmount(price)
-
-        item.ListingType = ListingTypeCodeType.FixedPriceItem
-        item.Currency = CurrencyCodeType.USD
-        item.ListingDuration = "GTC"
-        item.Location = ItemLocationCity
+        Dim item As ItemType = New ItemType With {
+            .Title = title,
+            .Description = description,
+            .BuyerGuaranteePrice = NewAmount(price),
+            .StartPrice = NewAmount(price),
+            .ListingType = ListingTypeCodeType.FixedPriceItem,
+            .Currency = CurrencyCodeType.USD,
+            .ListingDuration = "GTC",
+            .Location = ItemLocationCity
+        }
 
         Dim CountryCodeTranslator As CountryCodePolicy = New CountryCodePolicy
         item.Country = CountryCodeTranslator.TranslateCountryCodeToId(ItemLocationCountry)
@@ -138,7 +137,8 @@ Public Class ebayAPI
         Dim results As String = String.Empty
 
         Dim nvCollection As NameValueListTypeCollection = New NameValueListTypeCollection()
-        sqlDataReader = databaseAccess.FetchItemSpecifics(binr)
+        'sqlDataReader = databaseAccess.FetchItemSpecifics(binr)
+        sqlDataReader = databaseAccess.FetchItemSpecifics(134119)
         Do While sqlDataReader.Read()
             Dim specificsText As String = sqlDataReader.GetString(0)
 
@@ -147,6 +147,14 @@ Public Class ebayAPI
 
             Dim nvStringCollection As StringCollection = New StringCollection()
             Dim stringArray() As String = {specificsText.Split(",").Last}
+            nvStringCollection.AddRange(stringArray)
+            nameValueListType.Value = nvStringCollection
+            nvCollection.Add(nameValueListType)
+
+            nameValueListType.Name = "Object Type"
+
+            nvStringCollection.Clear()
+            stringArray = {"Ashtray"}
             nvStringCollection.AddRange(stringArray)
             nameValueListType.Value = nvStringCollection
             nvCollection.Add(nameValueListType)
@@ -189,14 +197,19 @@ Public Class ebayAPI
         Dim databaseAccess As New DatabaseAccess
 
         Dim apiCall As GetCategorySpecificsCall = New GetCategorySpecificsCall(apiContext)
-        Dim categoryIdList As StringCollection = New StringCollection From {
-            "23"
-        }
+
+        Dim sqlDataReader As SqlDataReader
+        Dim categoryIdList As StringCollection = New StringCollection
+
+        sqlDataReader = databaseAccess.FetchCategoryIds
+        Do While sqlDataReader.Read()
+            categoryIdList.Add(sqlDataReader.GetInt32(0).ToString)
+        Loop
+        sqlDataReader.Close()
 
         Dim emptyCollection As CategoryItemSpecificsTypeCollection = New CategoryItemSpecificsTypeCollection
         Dim lastYear As DateTime = DateTime.Today.AddYears(-1)
         Dim categorySpecifics As RecommendationsTypeCollection
-        categorySpecifics = apiCall.GetCategorySpecifics(categoryIdList)
         'categorySpecifics = apiCall.GetCategorySpecifics(categoryIdList, lastYear, 1000, 100, String.Empty, emptyCollection, False, False, False)
 
         Dim categorySpecific As RecommendationsType
@@ -204,29 +217,43 @@ Public Class ebayAPI
         Dim valueRecommendation As ValueRecommendationType
         Dim valueRecommendations As String
 
-        For Each categorySpecific In categorySpecifics
-            For Each nameRecommendation In categorySpecific.NameRecommendation
-                Console.WriteLine(nameRecommendation.Name)
-                If nameRecommendation.ValidationRules.MinValues > 0 Then
-                    mandatorySpecific = True
-                Else
-                    mandatorySpecific = False
-                End If
+        Dim i As Integer
 
-                valueRecommendations = String.Empty
-                For Each valueRecommendation In nameRecommendation.ValueRecommendation
-                    If valueRecommendations = String.Empty Then
-                        valueRecommendations = valueRecommendation.Value
+        Do While categoryIdList.Count > 100
+            categorySpecifics = apiCall.GetCategorySpecifics(categoryIdList)
+
+            For Each categorySpecific In categorySpecifics
+                For Each nameRecommendation In categorySpecific.NameRecommendation
+                    Console.WriteLine(nameRecommendation.Name)
+                    If nameRecommendation.ValidationRules.MinValues > 0 Then
+                        mandatorySpecific = True
                     Else
-                        valueRecommendations += "," + valueRecommendation.Value
+                        mandatorySpecific = False
                     End If
-                Next valueRecommendation
 
-                databaseAccess.InsertCategorySpecific(23, nameRecommendation.Name, mandatorySpecific, nameRecommendation.ValidationRules.ValueType, valueRecommendations)
+                    valueRecommendations = String.Empty
+                    For Each valueRecommendation In nameRecommendation.ValueRecommendation
+                        If valueRecommendations = String.Empty Then
+                            valueRecommendations = valueRecommendation.Value
+                        Else
+                            valueRecommendations += "," + valueRecommendation.Value
+                        End If
+                    Next valueRecommendation
 
-            Next nameRecommendation
+                    databaseAccess.InsertCategorySpecific(categorySpecific.CategoryID, nameRecommendation.Name, mandatorySpecific, nameRecommendation.ValidationRules.ValueType, valueRecommendations)
 
-        Next categorySpecific
+                Next nameRecommendation
+
+            Next categorySpecific
+
+            i = 0
+            Do While i < 100
+                categoryIdList.RemoveAt(i)
+                i += 1
+            Loop
+        Loop
+
+
     End Sub
 
     Public Sub GetUserInformation()
