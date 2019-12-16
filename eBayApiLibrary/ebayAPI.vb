@@ -83,19 +83,8 @@ Namespace eBayApiLibrary
 
                 Console.WriteLine("The item was updated successfully!")
 
-                Dim listingFee As Double = 0.0
-                Dim fee As FeeType
-                For Each fee In fees
-                    If (fee.Name = "ListingFee") Then
-                        listingFee = fee.Fee.Value
-                    End If
-                Next
-
                 Dim databaseAccess As New DatabaseAccess
-                databaseAccess.UpdateListingResults(binr, listingFee, item.ItemID)
-
-                Console.WriteLine(String.Format("Listing fee is: {0}", listingFee))
-                Console.WriteLine(String.Format("Listed Item ID: {0}", item.ItemID))
+                databaseAccess.UpdateRevisedListingResults(binr)
             Catch ex As Exception
                 Console.WriteLine("Failed to update item : " + ex.Message)
             End Try

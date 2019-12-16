@@ -1,8 +1,14 @@
 ﻿Module Module1
 
     Sub Main()
-        Dim ebayApi As New eBayApiLibrary.eBayApiLibrary.ebayAPI
-        ebayApi.GetCategoriesAndUpdateDatabase()
+        Dim databaseAccess As New eBayApiLibrary.eBayApiLibrary.DatabaseAccess
+
+        If databaseAccess.UpdateCategories() Then
+            Dim ebayApi As New eBayApiLibrary.eBayApiLibrary.ebayAPI
+            ebayApi.GetCategoriesAndUpdateDatabase()
+
+            databaseAccess.UpdateImportStatus("Kat")
+        End If
     End Sub
 
 End Module

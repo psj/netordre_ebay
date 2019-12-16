@@ -11,34 +11,34 @@ Module Module1
 
         sqlDataReader = databaseAccess.FetchRowsToExport()
         Do While sqlDataReader.Read()
-            'ebayApi.ListItem(
-            '    BiNr(sqlDataReader),
-            '    CategoryId(sqlDataReader),
-            '    SubCategoryId(sqlDataReader),
-            '    Title(sqlDataReader),
-            '    Description(sqlDataReader),
-            '    Price(sqlDataReader),
-            '    Zoom(sqlDataReader),
-            '    ItemLocationCity(sqlDataReader),
-            '    ItemLocationCountry(sqlDataReader)
-            ')
+            ebayApi.ListItem(
+                BiNr(sqlDataReader),
+                CategoryId(sqlDataReader),
+                SubCategoryId(sqlDataReader),
+                Title(sqlDataReader),
+                Description(sqlDataReader),
+                Price(sqlDataReader),
+                Zoom(sqlDataReader),
+                ItemLocationCity(sqlDataReader),
+                ItemLocationCountry(sqlDataReader)
+            )
         Loop
         sqlDataReader.Close()
 
         sqlDataReader = databaseAccess.FetchRowsToUpdate()
         Do While sqlDataReader.Read()
-            'ebayApi.UpdateItem(
-            '    BiNr(sqlDataReader),
-            '    CategoryId(sqlDataReader),
-            '    SubCategoryId(sqlDataReader),
-            '    Title(sqlDataReader),
-            '    Description(sqlDataReader),
-            '    Price(sqlDataReader),
-            '    Zoom(sqlDataReader),
-            '    ItemLocationCity(sqlDataReader),
-            '    ItemLocationCountry(sqlDataReader),
-            '    eBayProductId(sqlDataReader)
-            ')
+            ebayApi.UpdateItem(
+                eBayProductId(sqlDataReader),
+                BiNr(sqlDataReader),
+                CategoryId(sqlDataReader),
+                SubCategoryId(sqlDataReader),
+                Title(sqlDataReader),
+                Description(sqlDataReader),
+                Price(sqlDataReader),
+                Zoom(sqlDataReader),
+                ItemLocationCity(sqlDataReader),
+                ItemLocationCountry(sqlDataReader)
+            )
         Loop
         sqlDataReader.Close()
 

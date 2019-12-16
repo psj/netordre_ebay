@@ -73,7 +73,6 @@ Namespace eBayApiLibrary
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
             SELECT " & ColumnsToFetch() & "
-                  ,EMNER.[eBayProductId]
               FROM [testAntik].[dbo].[eBayEmner] EMNER
              WHERE EMNER.[eBayUpd] = 1
                AND EMNER.[eBayProductId] IS NOT NULL"
@@ -106,15 +105,27 @@ Namespace eBayApiLibrary
                    ,EMNER.[enhed]
                    ,EMNER.[enhed44]
 				   ,EMNER.[lokation_city]
-				   ,EMNER.[lokation_country]"
+				   ,EMNER.[lokation_country]
+                   ,EMNER.[eBayProductId]"
         End Function
 
         Public Sub UpdateListingResults(binr As Integer, listingFee As Double, eBayProductId As String)
             Dim commandText As String = "
             UPDATE [dbo].[eBayUpdate]
                SET [eBayProductId] = '" & eBayProductId & "'
+                  ,[eBayUpd] = 0
                   ,[eBayRettetDD] = GETDATE()
                   ,[eBayFee] = " & listingFee & "
+             WHERE [binr] = " & binr
+
+            ExecuteNonQuery(commandText)
+        End Sub
+
+        Public Sub UpdateRevisedListingResults(binr As Integer)
+            Dim commandText As String = "
+            UPDATE [dbo].[eBayUpdate]
+               SET [eBayUpd] = 0
+                  ,[eBayRettetDD] = GETDATE()
              WHERE [binr] = " & binr
 
             ExecuteNonQuery(commandText)
@@ -152,6 +163,49 @@ Namespace eBayApiLibrary
 
             Return sqlCommand.ExecuteReader()
         End Function
+
+        Public Function UpdateCategories() As Boolean
+            sqlCommand = sqlConnection.CreateCommand
+            sqlCommand.CommandText = "
+            SELECT [updKat]
+              FROM [testAntik].[dbo].[eBayGet]
+             WHERE [updKatDD] IS NULL"
+
+            Dim sqlDataReader As SqlDataReader
+            sqlDataReader = sqlCommand.ExecuteReader()
+
+            If sqlDataReader.HasRows() Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
+
+        Public Function UpdateCategorySpecifics() As Boolean
+            sqlCommand = sqlConnection.CreateCommand
+            sqlCommand.CommandText = "
+            SELECT [updIS]
+              FROM [testAntik].[dbo].[eBayGet]
+             WHERE [updISdd] IS NULL"
+
+            Dim sqlDataReader As SqlDataReader
+            sqlDataReader = sqlCommand.ExecuteReader()
+
+            If sqlDataReader.HasRows() Then
+                Return True
+            Else
+                Return False
+            End If
+        End Function
+
+        Public Sub UpdateImportStatus(fieldName As String)
+            Dim commandText As String = "
+            UPDATE [dbo].[eBayGet]
+               SET [upd" & fieldName & "DD] = GETDATE()
+             WHERE [upd" & fieldName & "] = 1"
+
+            ExecuteNonQuery(commandText)
+        End Sub
 
         Private Function ConnectionString() As String
             Return "Server=" & DatabaseServer() & "," & Port() & ";Database=testAntik;Uid=" & UserID() & ";Pwd=" & Password() & ";"
