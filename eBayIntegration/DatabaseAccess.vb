@@ -1,11 +1,21 @@
-﻿Imports System.Data.SqlClient
+﻿Imports System.Configuration
+Imports System.Configuration.ConfigurationSettings
+
+Imports System.Collections
+Imports System.Collections.Generic
+Imports System.Collections.Specialized
+
+Imports System.Data.SqlClient
 
 Public Class DatabaseAccess
     Private sqlConnection As SqlConnection
     Private sqlCommand As SqlCommand
 
     Public Sub New()
-        sqlConnection = New SqlConnection("Server=195.211.176.180,1433;Database=testAntik; Uid=psj; Pwd=SommerApi2019;")
+        Dim ConnectionStringToUse As String = ConnectionString()
+        Console.WriteLine(ConnectionStringToUse)
+
+        sqlConnection = New SqlConnection(ConnectionStringToUse)
         sqlConnection.Open()
     End Sub
 
@@ -24,6 +34,11 @@ Public Class DatabaseAccess
         Dim sanitizedName = Name.Replace("'", "''")
         Dim sanitizedValueRecommendations = ValueRecommendations.Replace("'", "''")
         Dim commandText As String = "INSERT INTO [testAntik].[dbo].[eBayItemSpecificDefinitions] ([CategoryId], [name], [mandatory], [valueType], [valueRecommendations]) VALUES (" & CategoryId.ToString & ",'" & sanitizedName & "'," & ConvertBooleanToIntString(Mandatory) & "," & ValueType & ",'" & sanitizedValueRecommendations & "')"
+        ExecuteNonQuery(commandText)
+    End Sub
+
+    Public Sub DeleteExistingCategorySpecifics()
+        Dim commandText As String = "DELETE From [testAntik].[dbo].[eBayItemSpecificDefinitions]"
         ExecuteNonQuery(commandText)
     End Sub
 
@@ -67,11 +82,22 @@ Public Class DatabaseAccess
         Return sqlCommand.ExecuteReader()
     End Function
 
-    Public Function FetchCategoryIds() As SqlDataReader
+    Public Sub UpdateListingResults(binr As Integer, listingFee As Double, eBayProductId As String)
+        Dim commandText As String = "
+            UPDATE [dbo].[eBayUpdate]
+               SET [eBayProductId] = '" & eBayProductId & "'
+                  ,[eBayFee] = " & listingFee & "
+             WHERE [binr] = " & binr
+
+        ExecuteNonQuery(commandText)
+    End Sub
+
+    Public Function FetchCategoryIds(lastCategoryId As Integer) As SqlDataReader
         sqlCommand = sqlConnection.CreateCommand
         sqlCommand.CommandText = "
-            SELECT [CategoryID]
-              FROM [testAntik].[dbo].[eBayKat]"
+            SELECT TOP (100) [CategoryID]
+              FROM [testAntik].[dbo].[eBayKat]
+             WHERE [CategoryID] > " & lastCategoryId
 
         Return sqlCommand.ExecuteReader()
     End Function
@@ -86,5 +112,29 @@ Public Class DatabaseAccess
                AND type = 'specific'"
 
         Return sqlCommand.ExecuteReader()
+    End Function
+
+    Private Function ConnectionString() As String
+        Return "Server=" & DatabaseServer() & "," & Port() & ";Database=testAntik;Uid=" & UserID() & ";Pwd=" & Password() & ";"
+    End Function
+
+    Private Function DatabaseServer() As String
+        Dim appSettings As NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
+        Return appSettings.Get("ip_address")
+    End Function
+
+    Private Function Port() As String
+        Dim appSettings As NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
+        Return appSettings.Get("port")
+    End Function
+
+    Private Function UserID() As String
+        Dim appSettings As NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
+        Return appSettings.Get("uid")
+    End Function
+
+    Private Function Password() As String
+        Dim appSettings As NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
+        Return appSettings.Get("password")
     End Function
 End Class

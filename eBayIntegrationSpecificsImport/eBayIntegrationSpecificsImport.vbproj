@@ -4,14 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{774DC7E5-123B-4586-BCDA-6CC0886F7556}</ProjectGuid>
+    <ProjectGuid>{8D968AFA-8EFF-4EE2-990F-B15F5CE618D2}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>eBayIntegration.eBayIntegration</StartupObject>
-    <RootNamespace>eBayIntegration</RootNamespace>
-    <AssemblyName>eBayIntegration</AssemblyName>
+    <StartupObject>eBayIntegrationSpecificsImport.Module1</StartupObject>
+    <RootNamespace>eBayIntegrationSpecificsImport</RootNamespace>
+    <AssemblyName>eBayIntegrationSpecificsImport</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Console</MyType>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
@@ -22,7 +22,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>eBayIntegration.xml</DocumentationFile>
+    <DocumentationFile>eBayIntegrationSpecificsImport.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -32,7 +32,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>eBayIntegration.xml</DocumentationFile>
+    <DocumentationFile>eBayIntegrationSpecificsImport.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -48,15 +48,9 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="eBay.Service">
-      <HintPath>..\..\psj\ebay-integration\eBayIntegration\eBay.Service.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Deployment" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -75,10 +69,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CountryCodePolicy.vb" />
-    <Compile Include="DatabaseAccess.vb" />
-    <Compile Include="ebayAPI.vb" />
-    <Compile Include="eBayIntegration.vb" />
+    <Compile Include="Module1.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -116,16 +107,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Configuration\ebay-config.yaml" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\eBayApiLibrary\eBayApiLibrary.vbproj">
       <Project>{c694dc86-822f-465f-8bf6-88c64cf8d5eb}</Project>
       <Name>eBayApiLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>copy $(ProjectDir)Configuration\* $(ProjectDir)$(OutDir)</PostBuildEvent>
-  </PropertyGroup>
 </Project>

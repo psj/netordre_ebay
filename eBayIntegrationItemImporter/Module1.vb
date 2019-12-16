@@ -1,16 +1,12 @@
-﻿Imports System
-Imports System.Data.SqlClient
+﻿Imports System.Data.SqlClient
 
-Module eBayIntegration
+Module Module1
 
     Sub Main()
-        Dim ebayApi As New ebayAPI
-        'ebayApi.GetCategoriesAndUpdateDatabase()
+        Dim ebayApi As New eBayApiLibrary.eBayApiLibrary.ebayAPI
         'ebayApi.GetUserInformation()
-        ebayApi.GetCategorySpecifics()
-        Return
 
-        Dim databaseAccess As New DatabaseAccess
+        Dim databaseAccess As New eBayApiLibrary.eBayApiLibrary.DatabaseAccess
         Dim sqlDataReader As SqlDataReader
 
         sqlDataReader = databaseAccess.FetchRowsToExport()

@@ -16,9 +16,6 @@ Public Class ebayAPI
     ' testuser_petersandager
     Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**H6glXQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZWEpAqdj6x9nY+seQ**DAcFAA**AAMAAA**EINwVuiMOj7p00p81bbVXgnbFO4JAPtp0rxdLYfIerKxFyl0IJIVfti1LPT9Ogqgcg/51W7YIFJHCwrQS3sedOr5/Ed5iZBoe8MCLSDPbyvWutPNoTpSRCBx5MJVm0ZYp9PLTLiFNW5gZOReAtIO9RkbHr3g8gB1pMkVj4X+vUOPKZxX+u3uT0SsZTZxw5UUGMnxnrUn0coyzSr7MOZWk3l/150Uu5Z7xuJf/iLVMN+fZoHD2tpA48P719IJqv2qokvapWrViDMZhv6lEKhf4dyExyReKnwdbdRKAB4uTChywFClp2h173u5kEEKMVlDqH0CwempMn1EhOnrNBk0FCdNZXIiPmryWx5DsU4Y/XDf5s7pX68ArCdKWOn0XBtHEX0jjgsRfnFNIgJlX+/f9kBtnKGFv511DDvYPb/A5gKbxdZMIK4Tleg6CskTeRY7gOO7UCjNBSKFbrqjEVw3i1dI4X5dn9Cu1FrtRrpwJcoaFPhXcyjf2WRX3O7Qlr7XBbjx4nXSTDC/h9v89SdWroXiRZzCOm5NwoJio2yCJXj3G2le/dzefnnTQJxpQ6t4A2DP1NSplMiLLEq5bk++URwVjikVWHCJHsqVLvljhhlHTaFBXDpQavOdn+9trCuw668ch6cRpjAAasRWW3Y6xFZK9I/hZh6jDoV9FqlFTPrwjl9Ma/RjSjB44Kw5eay9M4ZbJmH9Lgz2251v/zqDIW1qU+v6zmArxoJ5+CYb/nfmcWQphjBHKg/XQdwGbNEL"
 
-    'testuser ??
-    'Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**eDYaXQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZWEpAqdj6x9nY+seQ**DAcFAA**AAMAAA**EINwVuiMOj7p00p81bbVXgnbFO4JAPtp0rxdLYfIerKxFyl0IJIVfti1LPT9Ogqgcg/51W7YIFJHCwrQS3sedOr5/Ed5iZBoe8MCLSDPbyvWutPNoTpSRCBx5MJVm0ZYp9PLTLiFNW5gZOReAtIO9RkbHr3g8gB1pMkVj4X+vUOPKZxX+u3uT0SsZTZxw5UUGMnxnrUn0coyzSr7MOZWk3l/150Uu5Z7xuJf/iLVMN+fZoHD2tpA48P719IJqv2qokvapWrViDMZhv6lEKhf4dyExyReKnwdbdRKAB4uTChywFClp2h173u5kEEKMVlDqH0CwempMn1EhOnrNBk0FCdNZXIiPmryWx5DsU4Y/XDf5s7pX68ArCdKWOn0XBtHEX0jjgsRfnFNIgJlX+/f9kBtnKGFv511DDvYPb/A5gKbxdZMIK4Tleg6CskTeRY7gOO7UCjNBSKFbrqjEVw3i1dI4X5dn9Cu1FrtRrpwJcoaFPhXcyjf2WRX3O7Qlr7XBbjx4nXSTDC/h9v89SdWroXiRZzCOm5NwoJio2yCJXj3G2le/dzefnnTQJxpQ6t4A2DP1NSplMiLLEq5bk++URwVjikVWHCJHsqVLvljhhlHTaFBXDpQavOdn+9trCuw668ch6cRpjAAasRWW3Y6xFZK9I/hZh6jDoV9FqlFTPrwjl9Ma/RjSjB44Kw5eay9M4ZbJmH9Lgz2251v/zqDIW1qU+v6zmArxoJ5+CYb/nfmcWQphjBHKg/XQdwGbNEL"
-
     Public Sub New()
         GetApiContext()
     End Sub
@@ -61,6 +58,10 @@ Public Class ebayAPI
                     listingFee = fee.Fee.Value
                 End If
             Next
+
+            Dim databaseAccess As New DatabaseAccess
+            databaseAccess.UpdateListingResults(binr, listingFee, item.ItemID)
+
             Console.WriteLine(String.Format("Listing fee is: {0}", listingFee))
             Console.WriteLine(String.Format("Listed Item ID: {0}", item.ItemID))
         Catch ex As Exception
@@ -137,8 +138,9 @@ Public Class ebayAPI
         Dim results As String = String.Empty
 
         Dim nvCollection As NameValueListTypeCollection = New NameValueListTypeCollection()
-        'sqlDataReader = databaseAccess.FetchItemSpecifics(binr)
-        sqlDataReader = databaseAccess.FetchItemSpecifics(134119)
+        sqlDataReader = databaseAccess.FetchItemSpecifics(binr)
+        'sqlDataReader = databaseAccess.FetchItemSpecifics(134119)
+
         Do While sqlDataReader.Read()
             Dim specificsText As String = sqlDataReader.GetString(0)
 
@@ -151,13 +153,13 @@ Public Class ebayAPI
             nameValueListType.Value = nvStringCollection
             nvCollection.Add(nameValueListType)
 
-            nameValueListType.Name = "Object Type"
+            'nameValueListType.Name = "Object Type"
 
-            nvStringCollection.Clear()
-            stringArray = {"Ashtray"}
-            nvStringCollection.AddRange(stringArray)
-            nameValueListType.Value = nvStringCollection
-            nvCollection.Add(nameValueListType)
+            'nvStringCollection.Clear()
+            'stringArray = {"Ashtray"}
+            'nvStringCollection.AddRange(stringArray)
+            'nameValueListType.Value = nvStringCollection
+            'nvCollection.Add(nameValueListType)
         Loop
 
         Return nvCollection
@@ -194,37 +196,35 @@ Public Class ebayAPI
 
     Public Sub GetCategorySpecifics()
         Dim mandatorySpecific As Boolean
+        Dim lastCategoryId As Integer = 0
+
         Dim databaseAccess As New DatabaseAccess
+        databaseAccess.DeleteExistingCategorySpecifics()
 
         Dim apiCall As GetCategorySpecificsCall = New GetCategorySpecificsCall(apiContext)
 
-        Dim sqlDataReader As SqlDataReader
         Dim categoryIdList As StringCollection = New StringCollection
-
-        sqlDataReader = databaseAccess.FetchCategoryIds
-        Do While sqlDataReader.Read()
-            categoryIdList.Add(sqlDataReader.GetInt32(0).ToString)
-        Loop
-        sqlDataReader.Close()
-
         Dim emptyCollection As CategoryItemSpecificsTypeCollection = New CategoryItemSpecificsTypeCollection
-        Dim lastYear As DateTime = DateTime.Today.AddYears(-1)
         Dim categorySpecifics As RecommendationsTypeCollection
-        'categorySpecifics = apiCall.GetCategorySpecifics(categoryIdList, lastYear, 1000, 100, String.Empty, emptyCollection, False, False, False)
 
         Dim categorySpecific As RecommendationsType
         Dim nameRecommendation As NameRecommendationType
         Dim valueRecommendation As ValueRecommendationType
         Dim valueRecommendations As String
 
-        Dim i As Integer
+        Do While True
+            Console.WriteLine(lastCategoryId.ToString())
 
-        Do While categoryIdList.Count > 100
+            categoryIdList = FetchCategoryList(lastCategoryId)
+            If categoryIdList.Count() = 0 Then
+                Return
+            End If
+
             categorySpecifics = apiCall.GetCategorySpecifics(categoryIdList)
 
             For Each categorySpecific In categorySpecifics
                 For Each nameRecommendation In categorySpecific.NameRecommendation
-                    Console.WriteLine(nameRecommendation.Name)
+                    'Console.WriteLine(nameRecommendation.Name)
                     If nameRecommendation.ValidationRules.MinValues > 0 Then
                         mandatorySpecific = True
                     Else
@@ -244,17 +244,33 @@ Public Class ebayAPI
 
                 Next nameRecommendation
 
+                lastCategoryId = categorySpecific.CategoryID
             Next categorySpecific
+        Loop
+    End Sub
 
-            i = 0
-            Do While i < 100
-                categoryIdList.RemoveAt(i)
-                i += 1
-            Loop
+    Private Function FetchCategoryList(lastCategoryId As Integer) As StringCollection
+        Dim databaseAccess As New DatabaseAccess
+        Dim sqlDataReader As SqlDataReader
+        sqlDataReader = databaseAccess.FetchCategoryIds(lastCategoryId)
+
+        Dim categoryIdList As StringCollection = New StringCollection
+        Dim i As Integer
+
+        i = 0
+        Do While i < 100
+            If sqlDataReader.Read() = False Then
+                Return categoryIdList
+            Else
+                categoryIdList.Add(sqlDataReader.GetInt32(0).ToString)
+            End If
+
+            i += 1
         Loop
 
-
-    End Sub
+        sqlDataReader.Close()
+        Return categoryIdList
+    End Function
 
     Public Sub GetUserInformation()
         Try

@@ -1,9 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.705
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "eBayIntegration", "eBayIntegration\eBayIntegration.vbproj", "{774DC7E5-123B-4586-BCDA-6CC0886F7556}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "eBayApiLibrary", "eBayApiLibrary\eBayApiLibrary.vbproj", "{C694DC86-822F-465F-8BF6-88C64CF8D5EB}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "eBayIntegrationSpecificsImport", "eBayIntegrationSpecificsImport\eBayIntegrationSpecificsImport.vbproj", "{8D968AFA-8EFF-4EE2-990F-B15F5CE618D2}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "eBayIntegrationCategoryImport", "eBayIntegrationCategoryImport\eBayIntegrationCategoryImport.vbproj", "{3E4B05B0-94AA-4DC8-9DC2-15DBF2955D66}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "eBayIntegrationItemImporter", "eBayIntegrationItemImporter\eBayIntegrationItemImporter.vbproj", "{70164681-693D-441B-81D8-DDABBDAC8CC9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +23,22 @@ Global
 		{774DC7E5-123B-4586-BCDA-6CC0886F7556}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{774DC7E5-123B-4586-BCDA-6CC0886F7556}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{774DC7E5-123B-4586-BCDA-6CC0886F7556}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C694DC86-822F-465F-8BF6-88C64CF8D5EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C694DC86-822F-465F-8BF6-88C64CF8D5EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C694DC86-822F-465F-8BF6-88C64CF8D5EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C694DC86-822F-465F-8BF6-88C64CF8D5EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D968AFA-8EFF-4EE2-990F-B15F5CE618D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D968AFA-8EFF-4EE2-990F-B15F5CE618D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D968AFA-8EFF-4EE2-990F-B15F5CE618D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D968AFA-8EFF-4EE2-990F-B15F5CE618D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E4B05B0-94AA-4DC8-9DC2-15DBF2955D66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E4B05B0-94AA-4DC8-9DC2-15DBF2955D66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E4B05B0-94AA-4DC8-9DC2-15DBF2955D66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E4B05B0-94AA-4DC8-9DC2-15DBF2955D66}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70164681-693D-441B-81D8-DDABBDAC8CC9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70164681-693D-441B-81D8-DDABBDAC8CC9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70164681-693D-441B-81D8-DDABBDAC8CC9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70164681-693D-441B-81D8-DDABBDAC8CC9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
