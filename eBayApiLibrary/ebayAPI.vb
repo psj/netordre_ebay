@@ -71,6 +71,49 @@ Namespace eBayApiLibrary
 
         End Sub
 
+        Public Sub UpdateItem(eBayProductId As String, binr As Integer, CategoryId As Integer, SubCategoryId As Integer, title As String, description As String, price As Integer, zoom As Boolean, ItemLocationCity As String, ItemLocationCountry As String)
+            Try
+                Dim item As ItemType = BuildItem(binr, CategoryId, SubCategoryId, title, description, price, zoom, ItemLocationCity, ItemLocationCountry)
+                item.ItemID = eBayProductId
+
+                Dim apiCall As ReviseFixedPriceItemCall = New ReviseFixedPriceItemCall(apiContext)
+
+                Dim deletedFields As eBay.Service.Core.Soap.StringCollection = New StringCollection()
+                Dim fees As FeeTypeCollection = apiCall.ReviseFixedPriceItem(item, deletedFields)
+
+                Console.WriteLine("The item was updated successfully!")
+
+                Dim listingFee As Double = 0.0
+                Dim fee As FeeType
+                For Each fee In fees
+                    If (fee.Name = "ListingFee") Then
+                        listingFee = fee.Fee.Value
+                    End If
+                Next
+
+                Dim databaseAccess As New DatabaseAccess
+                databaseAccess.UpdateListingResults(binr, listingFee, item.ItemID)
+
+                Console.WriteLine(String.Format("Listing fee is: {0}", listingFee))
+                Console.WriteLine(String.Format("Listed Item ID: {0}", item.ItemID))
+            Catch ex As Exception
+                Console.WriteLine("Failed to update item : " + ex.Message)
+            End Try
+
+        End Sub
+
+        Public Sub EndItem(eBayProductId As String)
+            Try
+                Dim apicall As EndItemCall = New EndItemCall(apiContext)
+                apicall.EndItem(eBayProductId, EndReasonCodeType.NotAvailable)
+
+                Dim databaseAccess As New DatabaseAccess
+                databaseAccess.UpdateEndListingResults(eBayProductId)
+            Catch ex As Exception
+                Console.WriteLine("Failed to end item : " + ex.Message)
+            End Try
+        End Sub
+
         Private Function BuildItem(binr As Integer, CategoryId As Integer, SubCategoryId As Integer, title As String, description As String, price As Integer, zoom As Boolean, ItemLocationCity As String, ItemLocationCountry As String) As ItemType
             If price = 0 Then
                 Throw New System.Exception("Price cannot be 0")

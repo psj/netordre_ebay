@@ -61,34 +61,72 @@ Namespace eBayApiLibrary
         Public Function FetchRowsToExport() As SqlDataReader
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
-            SELECT EMNER.[kunr]
-                  ,EMNER.[binr]
-                  ,EMNER.[eBayCategoryId]
-                  ,EMNER.[eBayCategoryId2]
-                  ,EMNER.[antalEkstraFoto]
-                  ,EMNER.[pris]
-                  ,EMNER.[kort44]
-                  ,EMNER.[lang44]
-                  ,EMNER.[interntnr]
-                  ,EMNER.[apZoom]
-                  ,EMNER.[enhed]
-                  ,EMNER.[enhed44]
-				  ,EMNER.[lokation_city]
-				  ,EMNER.[lokation_country]
-              FROM [testAntik].[dbo].[eBayEmner] EMNER, [testAntik].[dbo].[eBayUpdate] UPDATE_TABLE
-             WHERE EMNER.[binr] = UPDATE_TABLE.[binr]
-               AND UPDATE_TABLE.[eBayUpd] = 1
-               AND UPDATE_TABLE.[eBayRettetDD] IS NULL"
+            SELECT " & ColumnsToFetch() & "
+              FROM [testAntik].[dbo].[eBayEmner] EMNER
+             WHERE EMNER.[eBayUpd] = 1
+               AND EMNER.[eBayProductId] IS NULL"
 
             Return sqlCommand.ExecuteReader()
+        End Function
+
+        Public Function FetchRowsToUpdate() As SqlDataReader
+            sqlCommand = sqlConnection.CreateCommand
+            sqlCommand.CommandText = "
+            SELECT " & ColumnsToFetch() & "
+                  ,EMNER.[eBayProductId]
+              FROM [testAntik].[dbo].[eBayEmner] EMNER
+             WHERE EMNER.[eBayUpd] = 1
+               AND EMNER.[eBayProductId] IS NOT NULL"
+
+            Return sqlCommand.ExecuteReader()
+        End Function
+
+        Public Function FetchRowsToDelete() As SqlDataReader
+            sqlCommand = sqlConnection.CreateCommand
+            sqlCommand.CommandText = "
+            SELECT " & ColumnsToFetch() & "
+              FROM [testAntik].[dbo].[eBayEmner] EMNER
+             WHERE EMNER.[eBaySlet] = 1
+               AND EMNER.[eBayProductId] IS NOT NULL"
+
+            Return sqlCommand.ExecuteReader()
+        End Function
+
+        Private Function ColumnsToFetch() As String
+            Return "EMNER.[kunr]
+                   ,EMNER.[binr]
+                   ,EMNER.[eBayCategoryId]
+                   ,EMNER.[eBayCategoryId2]
+                   ,EMNER.[antalEkstraFoto]
+                   ,EMNER.[pris]
+                   ,EMNER.[kort44]
+                   ,EMNER.[lang44]
+                   ,EMNER.[interntnr]
+                   ,EMNER.[apZoom]
+                   ,EMNER.[enhed]
+                   ,EMNER.[enhed44]
+				   ,EMNER.[lokation_city]
+				   ,EMNER.[lokation_country]"
         End Function
 
         Public Sub UpdateListingResults(binr As Integer, listingFee As Double, eBayProductId As String)
             Dim commandText As String = "
             UPDATE [dbo].[eBayUpdate]
                SET [eBayProductId] = '" & eBayProductId & "'
+                  ,[eBayRettetDD] = GETDATE()
                   ,[eBayFee] = " & listingFee & "
              WHERE [binr] = " & binr
+
+            ExecuteNonQuery(commandText)
+        End Sub
+
+        Public Sub UpdateEndListingResults(eBayProductId As String)
+            Dim commandText As String = "
+            UPDATE [dbo].[eBayUpdate]
+               SET [eBaySlet] = 0
+                  ,[eBaySletDD] = GETDATE()
+                  ,[eBayProductId] = NULL
+             WHERE [eBayProductId] = " & eBayProductId
 
             ExecuteNonQuery(commandText)
         End Sub

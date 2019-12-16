@@ -11,17 +11,40 @@ Module Module1
 
         sqlDataReader = databaseAccess.FetchRowsToExport()
         Do While sqlDataReader.Read()
-            ebayApi.ListItem(
-                BiNr(sqlDataReader),
-                CategoryId(sqlDataReader),
-                SubCategoryId(sqlDataReader),
-                Title(sqlDataReader),
-                Description(sqlDataReader),
-                Price(sqlDataReader),
-                Zoom(sqlDataReader),
-                ItemLocationCity(sqlDataReader),
-                ItemLocationCountry(sqlDataReader)
-            )
+            'ebayApi.ListItem(
+            '    BiNr(sqlDataReader),
+            '    CategoryId(sqlDataReader),
+            '    SubCategoryId(sqlDataReader),
+            '    Title(sqlDataReader),
+            '    Description(sqlDataReader),
+            '    Price(sqlDataReader),
+            '    Zoom(sqlDataReader),
+            '    ItemLocationCity(sqlDataReader),
+            '    ItemLocationCountry(sqlDataReader)
+            ')
+        Loop
+        sqlDataReader.Close()
+
+        sqlDataReader = databaseAccess.FetchRowsToUpdate()
+        Do While sqlDataReader.Read()
+            'ebayApi.UpdateItem(
+            '    BiNr(sqlDataReader),
+            '    CategoryId(sqlDataReader),
+            '    SubCategoryId(sqlDataReader),
+            '    Title(sqlDataReader),
+            '    Description(sqlDataReader),
+            '    Price(sqlDataReader),
+            '    Zoom(sqlDataReader),
+            '    ItemLocationCity(sqlDataReader),
+            '    ItemLocationCountry(sqlDataReader),
+            '    eBayProductId(sqlDataReader)
+            ')
+        Loop
+        sqlDataReader.Close()
+
+        sqlDataReader = databaseAccess.FetchRowsToDelete()
+        Do While sqlDataReader.Read()
+            ebayApi.EndItem(eBayProductId(sqlDataReader))
         Loop
     End Sub
 
@@ -67,6 +90,10 @@ Module Module1
 
     Function ItemLocationCountry(row As SqlDataReader) As String
         Return row.GetString(13)
+    End Function
+
+    Function eBayProductId(row As SqlDataReader) As String
+        Return row.GetString(14)
     End Function
 
 End Module
