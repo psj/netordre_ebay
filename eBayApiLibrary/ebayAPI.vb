@@ -6,6 +6,9 @@ Imports eBay.Service.EPS
 Imports System.DateTime
 Imports System.Data.SqlClient
 
+Imports System.Collections
+Imports System.Collections.Generic
+
 Namespace eBayApiLibrary
     Public Class ebayAPI
         Private apiContext As ApiContext = Nothing
@@ -22,12 +25,20 @@ Namespace eBayApiLibrary
         End Sub
 
         Public Sub GetCategoriesAndUpdateDatabase()
+            Dim databaseAccess As New DatabaseAccess
+
+            If IsProduction() Then
+                databaseAccess.MergeCategoriesFromTest()
+                Return
+            End If
+
             Try
+                databaseAccess.DeleteExistingCategories()
+
                 Dim apiCall As GetCategoriesCall = New GetCategoriesCall(apiContext)
                 apiCall.DetailLevelList.Add(DetailLevelCodeType.ReturnAll)
                 apiCall.Execute()
 
-                Dim databaseAccess As New DatabaseAccess
                 Dim categories As CategoryTypeCollection = apiCall.GetCategories()
                 Dim category As CategoryType
 
@@ -67,6 +78,9 @@ Namespace eBayApiLibrary
                 Console.WriteLine(String.Format("Listed Item ID: {0}", item.ItemID))
             Catch ex As Exception
                 Console.WriteLine("Failed to list item : " + ex.Message)
+
+                Dim databaseAccess As New DatabaseAccess
+                databaseAccess.UpdateListingError(binr, ex.Message)
             End Try
 
         End Sub
@@ -172,27 +186,19 @@ Namespace eBayApiLibrary
 
             Dim nvCollection As NameValueListTypeCollection = New NameValueListTypeCollection()
             sqlDataReader = databaseAccess.FetchItemSpecifics(binr)
-            'sqlDataReader = databaseAccess.FetchItemSpecifics(134119)
 
             Do While sqlDataReader.Read()
-                Dim specificsText As String = sqlDataReader.GetString(0)
+                Dim specificsType As String = sqlDataReader.GetString(0)
+                Dim specificsValues As String = sqlDataReader.GetString(1)
 
                 Dim nameValueListType As NameValueListType = New NameValueListType()
-                nameValueListType.Name = specificsText.Split(",").First
+                nameValueListType.Name = specificsType
 
                 Dim nvStringCollection As StringCollection = New StringCollection()
-                Dim stringArray() As String = {specificsText.Split(",").Last}
+                Dim stringArray() As String = specificsValues.Split(",")
                 nvStringCollection.AddRange(stringArray)
                 nameValueListType.Value = nvStringCollection
                 nvCollection.Add(nameValueListType)
-
-                'nameValueListType.Name = "Object Type"
-
-                'nvStringCollection.Clear()
-                'stringArray = {"Ashtray"}
-                'nvStringCollection.AddRange(stringArray)
-                'nameValueListType.Value = nvStringCollection
-                'nvCollection.Add(nameValueListType)
             Loop
 
             Return nvCollection
@@ -200,8 +206,8 @@ Namespace eBayApiLibrary
 
         Private Function BuildShippingDetails() As ShippingDetailsType
             Dim shippingDetails As ShippingDetailsType = New ShippingDetailsType With {
-            .ShippingType = ShippingTypeCodeType.Flat
-        }
+                .ShippingType = ShippingTypeCodeType.Flat
+            }
 
             'shippingOptions.ShippingInsuranceCost = NewAmount(1)
             Dim shippingOptionsWorldwide As ShippingServiceOptionsType = New ShippingServiceOptionsType With {
@@ -228,10 +234,16 @@ Namespace eBayApiLibrary
         End Function
 
         Public Sub GetCategorySpecifics()
+            Dim databaseAccess As New DatabaseAccess
+
+            If IsProduction() Then
+                databaseAccess.MergeSpecificsFromTest()
+                Return
+            End If
+
             Dim mandatorySpecific As Boolean
             Dim lastCategoryId As Integer = 0
 
-            Dim databaseAccess As New DatabaseAccess
             databaseAccess.DeleteExistingCategorySpecifics()
 
             Dim apiCall As GetCategorySpecificsCall = New GetCategorySpecificsCall(apiContext)
@@ -348,17 +360,34 @@ Namespace eBayApiLibrary
             apiCredential.eBayToken = ebayAuthToken
 
             apiContext = New ApiContext With {
-            .SoapApiServerUrl = ApiServerUrl,
-            .ApiCredential = apiCredential,
-            .Site = SiteCodeType.US,
-            .ApiLogManager = New ApiLogManager
-        }
+                .SoapApiServerUrl = ApiServerUrl,
+                .ApiCredential = apiCredential,
+                .Site = SiteCodeType.US,
+                .ApiLogManager = New ApiLogManager
+            }
 
             Dim fileLogger As FileLogger = New FileLogger("listing_log.txt", True, True, True)
             apiContext.ApiLogManager.ApiLoggerList.Add(fileLogger)
             apiContext.ApiLogManager.EnableLogging = True
 
             Return apiContext
+        End Function
+
+        Private Sub SetApiContextCredentials(eBayToken As String)
+            Dim apiCredential As ApiCredential = New ApiCredential
+
+            apiCredential.eBayToken = ebayAuthToken
+            apiContext.ApiCredential = apiCredential
+        End Sub
+
+        Private Function IsProduction() As Boolean
+            Dim appSettings As System.Collections.Specialized.NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
+
+            If appSettings.Get("production") = "false" Then
+                Return False
+            Else
+                Return True
+            End If
         End Function
 
         Private Function NewAmount(amount As Integer) As AmountType

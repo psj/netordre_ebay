@@ -7,6 +7,8 @@ Module Module1
         'ebayApi.GetUserInformation()
 
         Dim databaseAccess As New eBayApiLibrary.eBayApiLibrary.DatabaseAccess
+        databaseAccess.OutputConnectionString()
+
         Dim sqlDataReader As SqlDataReader
 
         sqlDataReader = databaseAccess.FetchRowsToExport()

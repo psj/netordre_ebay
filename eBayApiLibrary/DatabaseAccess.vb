@@ -13,10 +13,7 @@ Namespace eBayApiLibrary
         Private sqlCommand As SqlCommand
 
         Public Sub New()
-            Dim ConnectionStringToUse As String = ConnectionString()
-            Console.WriteLine(ConnectionStringToUse)
-
-            sqlConnection = New SqlConnection(ConnectionStringToUse)
+            sqlConnection = New SqlConnection(ConnectionString())
             sqlConnection.Open()
         End Sub
 
@@ -28,6 +25,21 @@ Namespace eBayApiLibrary
         Public Sub InsertOrUpdateCategory(BestOfferEnabled As Boolean, AutoPayEnabled As Boolean, CategoryID As Integer, CategoryLevel As Integer, CategoryName As String, CategoryParentID As Integer)
             Dim sanitizedCategoryName = CategoryName.Replace("'", "''")
             Dim commandText As String = "INSERT INTO [testAntik].[dbo].[eBayKat] ([BestOfferEnabled], [AutoPayEnabled], [CategoryID], [CategoryLevel], [CategoryName], [CategoryParentID]) VALUES (" & ConvertBooleanToIntString(BestOfferEnabled) & "," & ConvertBooleanToIntString(AutoPayEnabled) & "," & CategoryID.ToString & "," & CategoryLevel.ToString & ",'" & sanitizedCategoryName & "'," & CategoryParentID.ToString & ")"
+            ExecuteNonQuery(commandText)
+        End Sub
+
+        Public Sub DeleteExistingCategories()
+            Dim commandText As String = "DELETE From [testAntik].[dbo].[eBayKat]"
+            ExecuteNonQuery(commandText)
+        End Sub
+
+        Public Sub MergeCategoriesFromTest()
+            Dim commandText As String = MergeCategoriesCommandText()
+            ExecuteNonQuery(commandText)
+        End Sub
+
+        Public Sub MergeSpecificsFromTest()
+            Dim commandText As String = MergeSpecificsCommandText()
             ExecuteNonQuery(commandText)
         End Sub
 
@@ -142,6 +154,16 @@ Namespace eBayApiLibrary
             ExecuteNonQuery(commandText)
         End Sub
 
+        Public Sub UpdateListingError(binr As Integer, ErrorMessage As String)
+            Dim commandText As String = "
+            UPDATE [dbo].[eBayUpdate]
+               SET [eBayError] = 1
+                  ,[eBayLog] = '" & ErrorMessage & "'
+             WHERE [binr] = " & binr
+
+            ExecuteNonQuery(commandText)
+        End Sub
+
         Public Function FetchCategoryIds(lastCategoryId As Integer) As SqlDataReader
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
@@ -155,11 +177,11 @@ Namespace eBayApiLibrary
         Public Function FetchItemSpecifics(binr As Integer) As SqlDataReader
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
-            SELECT [text]
+            SELECT [type]
+                  ,[text]
                   ,[customField]
               FROM [testAntik].[dbo].[eBayItemSpecifics]
-             WHERE [binr] = " & binr & "
-               AND type = 'specific'"
+             WHERE [binr] = " & binr
 
             Return sqlCommand.ExecuteReader()
         End Function
@@ -207,8 +229,16 @@ Namespace eBayApiLibrary
             ExecuteNonQuery(commandText)
         End Sub
 
+        Public Sub OutputConnectionString()
+            Console.WriteLine(PrintConnectionString())
+        End Sub
+
         Private Function ConnectionString() As String
-            Return "Server=" & DatabaseServer() & "," & Port() & ";Database=testAntik;Uid=" & UserID() & ";Pwd=" & Password() & ";"
+            Return PrintConnectionString() & ";Pwd=" & Password() & ";"
+        End Function
+
+        Private Function PrintConnectionString() As String
+            Return "Server=" & DatabaseServer() & "," & Port() & ";Database=" & DatabaseName() & ";Uid=" & UserID()
         End Function
 
         Private Function DatabaseServer() As String
@@ -221,6 +251,11 @@ Namespace eBayApiLibrary
             Return appSettings.Get("port")
         End Function
 
+        Private Function DatabaseName() As String
+            Dim appSettings As NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
+            Return appSettings.Get("database")
+        End Function
+
         Private Function UserID() As String
             Dim appSettings As NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
             Return appSettings.Get("uid")
@@ -229,6 +264,29 @@ Namespace eBayApiLibrary
         Private Function Password() As String
             Dim appSettings As NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
             Return appSettings.Get("password")
+        End Function
+
+        Private Function MergeSpecificsCommandText() As String
+            Return "MERGE phd400.dbo.eBayItemSpecificDefinitions AS T
+                    USING (SELECT categoryId, [name], mandatory, valueType, valueRecommendations FROM eBayItemSpecificDefinitions) AS S
+                    ON (T.CategoryID = S.CategoryID) AND T.[name] = S.[name]
+                    WHEN MATCHED THEN UPDATE SET T.mandatory = S.mandatory, T.valueType = S.valueType, T.valueRecommendations = S.valueRecommendations
+                    WHEN NOT MATCHED BY TARGET THEN INSERT (categoryId, [name], mandatory, valueType, valueRecommendations)
+                                                 VALUES (S.categoryId, S.[name], S.mandatory, S.valueType, S.valueRecommendations)
+                    WHEN NOT MATCHED BY SOURCE THEN DELETE
+                    ;"
+        End Function
+
+        Private Function MergeCategoriesCommandText() As String
+            Return "MERGE phd400.dbo.eBayKat AS T
+                    USING (SELECT BestOfferEnabled, AutoPayEnabled, CategoryID, CategoryLevel, CategoryName, CategoryParentID FROM testAntik.dbo.eBayKat) AS S
+                    ON (T.CategoryID = S.CategoryID)
+                    WHEN MATCHED THEN UPDATE SET T.BestOfferEnabled = S.BestOfferEnabled, T.AutoPayEnabled = S.AutoPayEnabled,T.CategoryLevel = S.CategoryLevel
+                                                 , T.CategoryName = S.CategoryName, T.CategoryParentID = S.CategoryParentID
+                    WHEN NOT MATCHED BY TARGET THEN INSERT (BestOfferEnabled, AutoPayEnabled, CategoryID, CategoryLevel, CategoryName, CategoryParentID)
+                                                 VALUES (S.BestOfferEnabled, S.AutoPayEnabled, S.CategoryID, S.CategoryLevel, S.CategoryName, S.CategoryParentID)
+                    WHEN NOT MATCHED BY SOURCE THEN DELETE
+                    ;"
         End Function
     End Class
 End Namespace
