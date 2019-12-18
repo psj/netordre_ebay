@@ -74,7 +74,7 @@ Namespace eBayApiLibrary
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
             SELECT " & ColumnsToFetch() & "
-              FROM [testAntik].[dbo].[eBayEmner] EMNER
+              FROM [eBayEmner] EMNER
              WHERE EMNER.[eBayUpd] = 1
                AND EMNER.[eBayProductId] IS NULL"
 
@@ -85,7 +85,7 @@ Namespace eBayApiLibrary
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
             SELECT " & ColumnsToFetch() & "
-              FROM [testAntik].[dbo].[eBayEmner] EMNER
+              FROM [eBayEmner] EMNER
              WHERE EMNER.[eBayUpd] = 1
                AND EMNER.[eBayProductId] IS NOT NULL"
 
@@ -96,7 +96,7 @@ Namespace eBayApiLibrary
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
             SELECT " & ColumnsToFetch() & "
-              FROM [testAntik].[dbo].[eBayEmner] EMNER
+              FROM [eBayEmner] EMNER
              WHERE EMNER.[eBaySlet] = 1
                AND EMNER.[eBayProductId] IS NOT NULL"
 
@@ -168,7 +168,7 @@ Namespace eBayApiLibrary
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
             SELECT TOP (100) [CategoryID]
-              FROM [testAntik].[dbo].[eBayKat]
+              FROM [dbo].[eBayKat]
              WHERE [CategoryID] > " & lastCategoryId
 
             Return sqlCommand.ExecuteReader()
@@ -180,7 +180,7 @@ Namespace eBayApiLibrary
             SELECT [type]
                   ,[text]
                   ,[customField]
-              FROM [testAntik].[dbo].[eBayItemSpecifics]
+              FROM [dbo].[eBayItemSpecifics]
              WHERE [binr] = " & binr
 
             Return sqlCommand.ExecuteReader()
@@ -190,7 +190,7 @@ Namespace eBayApiLibrary
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
             SELECT [updKat]
-              FROM [testAntik].[dbo].[eBayGet]
+              FROM [dbo].[eBayGet]
              WHERE [updKatDD] IS NULL"
 
             Dim sqlDataReader As SqlDataReader
@@ -207,7 +207,7 @@ Namespace eBayApiLibrary
             sqlCommand = sqlConnection.CreateCommand
             sqlCommand.CommandText = "
             SELECT [updIS]
-              FROM [testAntik].[dbo].[eBayGet]
+              FROM [dbo].[eBayGet]
              WHERE [updISdd] IS NULL"
 
             Dim sqlDataReader As SqlDataReader
