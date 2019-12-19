@@ -1,9 +1,9 @@
 ﻿Imports System.Data.SqlClient
 
 Module Module1
+    ReadOnly ebayApi As New eBayApiLibrary.eBayApiLibrary.ebayAPI
 
     Sub Main()
-        Dim ebayApi As New eBayApiLibrary.eBayApiLibrary.ebayAPI
         'ebayApi.GetUserInformation()
 
         Dim databaseAccess As New eBayApiLibrary.eBayApiLibrary.DatabaseAccess
@@ -22,7 +22,8 @@ Module Module1
                 Price(sqlDataReader),
                 Zoom(sqlDataReader),
                 ItemLocationCity(sqlDataReader),
-                ItemLocationCountry(sqlDataReader)
+                ItemLocationCountry(sqlDataReader),
+                ebayAuthToken(sqlDataReader)
             )
         Loop
         sqlDataReader.Close()
@@ -39,14 +40,18 @@ Module Module1
                 Price(sqlDataReader),
                 Zoom(sqlDataReader),
                 ItemLocationCity(sqlDataReader),
-                ItemLocationCountry(sqlDataReader)
+                ItemLocationCountry(sqlDataReader),
+                ebayAuthToken(sqlDataReader)
             )
         Loop
         sqlDataReader.Close()
 
         sqlDataReader = databaseAccess.FetchRowsToDelete()
         Do While sqlDataReader.Read()
-            ebayApi.EndItem(eBayProductId(sqlDataReader))
+            ebayApi.EndItem(
+                eBayProductId(sqlDataReader),
+                ebayAuthToken(sqlDataReader)
+            )
         Loop
     End Sub
 
@@ -96,6 +101,14 @@ Module Module1
 
     Function eBayProductId(row As SqlDataReader) As String
         Return row.GetString(14)
+    End Function
+
+    Function ebayAuthToken(row As SqlDataReader) As String
+        If ebayApi.IsProduction() Then
+            Return row.GetString(15)
+        Else
+            Return row.GetString(16)
+        End If
     End Function
 
 End Module

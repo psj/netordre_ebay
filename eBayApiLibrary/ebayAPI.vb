@@ -54,9 +54,11 @@ Namespace eBayApiLibrary
             End Try
         End Sub
 
-        Public Sub ListItem(binr As Integer, CategoryId As Integer, SubCategoryId As Integer, title As String, description As String, price As Integer, zoom As Boolean, ItemLocationCity As String, ItemLocationCountry As String)
+        Public Sub ListItem(binr As Integer, CategoryId As Integer, SubCategoryId As Integer, title As String, description As String, price As Integer, zoom As Boolean, ItemLocationCity As String, ItemLocationCountry As String, ebayAuthToken As String)
             Try
                 Dim item As ItemType = BuildItem(binr, CategoryId, SubCategoryId, title, description, price, zoom, ItemLocationCity, ItemLocationCountry)
+
+                SetApiContextCredentials(ebayAuthToken)
 
                 Dim apiCall As AddFixedPriceItemCall = New AddFixedPriceItemCall(apiContext)
                 Dim fees As FeeTypeCollection = apiCall.AddFixedPriceItem(item)
@@ -85,10 +87,12 @@ Namespace eBayApiLibrary
 
         End Sub
 
-        Public Sub UpdateItem(eBayProductId As String, binr As Integer, CategoryId As Integer, SubCategoryId As Integer, title As String, description As String, price As Integer, zoom As Boolean, ItemLocationCity As String, ItemLocationCountry As String)
+        Public Sub UpdateItem(eBayProductId As String, binr As Integer, CategoryId As Integer, SubCategoryId As Integer, title As String, description As String, price As Integer, zoom As Boolean, ItemLocationCity As String, ItemLocationCountry As String, ebayAuthToken As String)
             Try
                 Dim item As ItemType = BuildItem(binr, CategoryId, SubCategoryId, title, description, price, zoom, ItemLocationCity, ItemLocationCountry)
                 item.ItemID = eBayProductId
+
+                SetApiContextCredentials(ebayAuthToken)
 
                 Dim apiCall As ReviseFixedPriceItemCall = New ReviseFixedPriceItemCall(apiContext)
 
@@ -105,8 +109,10 @@ Namespace eBayApiLibrary
 
         End Sub
 
-        Public Sub EndItem(eBayProductId As String)
+        Public Sub EndItem(eBayProductId As String, ebayAuthToken As String)
             Try
+                SetApiContextCredentials(ebayAuthToken)
+
                 Dim apicall As EndItemCall = New EndItemCall(apiContext)
                 apicall.EndItem(eBayProductId, EndReasonCodeType.NotAvailable)
 
@@ -380,7 +386,7 @@ Namespace eBayApiLibrary
             apiContext.ApiCredential = apiCredential
         End Sub
 
-        Private Function IsProduction() As Boolean
+        Public Function IsProduction() As Boolean
             Dim appSettings As System.Collections.Specialized.NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
 
             If appSettings.Get("production") = "false" Then

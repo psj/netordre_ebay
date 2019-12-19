@@ -118,7 +118,9 @@ Namespace eBayApiLibrary
                    ,EMNER.[enhed44]
 				   ,EMNER.[lokation_city]
 				   ,EMNER.[lokation_country]
-                   ,EMNER.[eBayProductId]"
+                   ,EMNER.[eBayProductId]
+                   ,EMNER.[Token]
+                   ,EMNER.[TokenAppIdSandbox]"
         End Function
 
         Public Sub UpdateListingResults(binr As Integer, listingFee As Double, eBayProductId As String)
