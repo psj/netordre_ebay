@@ -111,4 +111,9 @@ Module Module1
         End If
     End Function
 
+    Function CustomerAboutText(row As SqlDataReader) As String
+        Return row.GetString(18)
+    End Function
+
+
 End Module

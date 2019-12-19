@@ -128,6 +128,8 @@ Namespace eBayApiLibrary
             UPDATE [dbo].[eBayUpdate]
                SET [eBayProductId] = '" & eBayProductId & "'
                   ,[eBayUpd] = 0
+                  ,[eBayLog] = NULL
+                  ,[eBayError] = 0
                   ,[eBayRettetDD] = GETDATE()
                   ,[eBayFee] = " & listingFee & "
              WHERE [binr] = " & binr
@@ -139,6 +141,8 @@ Namespace eBayApiLibrary
             Dim commandText As String = "
             UPDATE [dbo].[eBayUpdate]
                SET [eBayUpd] = 0
+                  ,[eBayLog] = NULL
+                  ,[eBayError] = 0
                   ,[eBayRettetDD] = GETDATE()
              WHERE [binr] = " & binr
 

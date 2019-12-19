@@ -12,13 +12,12 @@ Imports System.Collections.Generic
 Namespace eBayApiLibrary
     Public Class ebayAPI
         Private apiContext As ApiContext = Nothing
-        Private ApiServerUrl As String = "https://api.sandbox.ebay.com/wsapi"
 
-        ' testuser ??
-        'Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**CojZXA**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZKFoQydj6x9nY+seQ**7/4EAA**AAMAAA**saEELQopmdyEDeta6ILFQHmzZG9lK8nwKD57KDJHv49DCHEb96nEkqAnpuslD+Wuv/R55NXHE1UXqpj6C/yzglgNaaK13Bd2wNV/Gy//Ydh/ZEuRs1jtgURFw+rEfj/0fFRhXQH+XFPeUhfRmAkQRC7RKw/RcBP7i63y/LVa3KMDQmEhFrHK8+uDk+L+guT948IAHpWck+iN65WozrxU6TmqQ3tk6ZCWQXjNw4hYFJRi19HSI43MuBvRi0wV8hg7evaCu5WCPSNY2cTZbv5BagLIRGcD6h8dCCUotakEfqIun0qexnuAigeaNvLo8Cneoz5WNV7ZYbr/ynZelNDTSpUANDpNrAN2tsirWBThYI3RU/XYJgZUrN8Z7d1wPSpbnKfVfrSvtzkAdnh64mMz1sxUlPUwcVhZHWsa69EBk9sIkqXjbtq5ERxhzgbx2DqwK1foUAf6X7+W5a2/wsF24ERq3Dg1pyPtXe0+pXI6Mp6iNuG9onsLOx2lPw53GsBerPD2hFKh6nxB8m7tTUPagz1ti5Eg8GOpsmHIlq5mNX/ZgOc4nxnimMhyCgErtFCsdEYOeBP9wuUoz2v6hc/7OAc0Ax5j3Ev8yXbkW9cwSKEHzIP4yH22tZue6pKsVIYRk1Z2bHOynIrbkFi5tPztyGyPFkAcUhZertXWG4LtnPkJR/CjRuPsY9ekP3vs6f22nRn03/qQDy/o4GIQWtFzS4+qfUpPLmYIJ1KDck45dLUNu8oZsc5VWkJjSyrQgUQr"
+        ' production - Danamantik
+        Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**i4X7XQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6AElYOgDJCLqAidj6x9nY+seQ**uy0GAA**AAMAAA**ZlUSd5ETu5tRv8094GuVcAg6Z+QBCKiBZz0oFGtSyHC3Fw95rrQ0QxqZzi0z4/k+9iRGSFSVFDP2rp2UY1pUYnqD7xm6jjxZJzSuiOJPZZJ038JHrL/Hlef2jiRNc9edTrjgsexO7ym/5QBRu0HcquIGOkcIvITlq8K1FHhjBE/a+rtVG8LG7F6aURbaMz1MUtVKdUbXcmk3pEpP9dtTQhX7vw6j+wSCQy3H3QV/8Ya2fS0S6oYI5noWd0Gr8KSLtLQEiBGtlaFz3OfOs2txWO69oAZfLRovXEaqcZE3Sk87aTR3GC30kKQZbfrmzxT3xu57EbiTztuP+2X3zIa0YoyN0ZKwU8FU581TE4xq1NuOMJZ/sYtMpcP3DHTQvbdvJBdLeFPWxogaEUMn028QqC3ZaE+8u9enDtH+IQWO0jx3sBe8Y2jwoZa3VuG8IyH3UZCC8kPuwY8CeeUrmgJwir7Uo04QebkBiDKhya+RETgRaZvNoaSO9M3UdUPt2jUYN35ZabP03/w/Z53b9zHOWJbxElPsU3s0cnE0Tr/WyieYF39pxi9h63BgCg8vhtNcwsFiYBAA11BC9+rAm6/tgJPy+ougPAGdIudNCnVNI79fiL++jhc1vpvyEjtBQ6cE6BJjmWEgs8/Z81niyzOXkLTYGsSjWW+Dq1NMZc8tfuJVyt7qD8ONtjwHKdzqrYEmPxIwffEEBNxZbL/5/zi3f/WsFLgpxLF4tSRTbbDpDnD3BDje19m3GA7cx51dJO8A"
 
         ' testuser_petersandager
-        Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**H6glXQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZWEpAqdj6x9nY+seQ**DAcFAA**AAMAAA**EINwVuiMOj7p00p81bbVXgnbFO4JAPtp0rxdLYfIerKxFyl0IJIVfti1LPT9Ogqgcg/51W7YIFJHCwrQS3sedOr5/Ed5iZBoe8MCLSDPbyvWutPNoTpSRCBx5MJVm0ZYp9PLTLiFNW5gZOReAtIO9RkbHr3g8gB1pMkVj4X+vUOPKZxX+u3uT0SsZTZxw5UUGMnxnrUn0coyzSr7MOZWk3l/150Uu5Z7xuJf/iLVMN+fZoHD2tpA48P719IJqv2qokvapWrViDMZhv6lEKhf4dyExyReKnwdbdRKAB4uTChywFClp2h173u5kEEKMVlDqH0CwempMn1EhOnrNBk0FCdNZXIiPmryWx5DsU4Y/XDf5s7pX68ArCdKWOn0XBtHEX0jjgsRfnFNIgJlX+/f9kBtnKGFv511DDvYPb/A5gKbxdZMIK4Tleg6CskTeRY7gOO7UCjNBSKFbrqjEVw3i1dI4X5dn9Cu1FrtRrpwJcoaFPhXcyjf2WRX3O7Qlr7XBbjx4nXSTDC/h9v89SdWroXiRZzCOm5NwoJio2yCJXj3G2le/dzefnnTQJxpQ6t4A2DP1NSplMiLLEq5bk++URwVjikVWHCJHsqVLvljhhlHTaFBXDpQavOdn+9trCuw668ch6cRpjAAasRWW3Y6xFZK9I/hZh6jDoV9FqlFTPrwjl9Ma/RjSjB44Kw5eay9M4ZbJmH9Lgz2251v/zqDIW1qU+v6zmArxoJ5+CYb/nfmcWQphjBHKg/XQdwGbNEL"
+        'Private ebayAuthToken As String = "AgAAAA**AQAAAA**aAAAAA**H6glXQ**nY+sHZ2PrBmdj6wVnY+sEZ2PrA2dj6wFk4aiCZWEpAqdj6x9nY+seQ**DAcFAA**AAMAAA**EINwVuiMOj7p00p81bbVXgnbFO4JAPtp0rxdLYfIerKxFyl0IJIVfti1LPT9Ogqgcg/51W7YIFJHCwrQS3sedOr5/Ed5iZBoe8MCLSDPbyvWutPNoTpSRCBx5MJVm0ZYp9PLTLiFNW5gZOReAtIO9RkbHr3g8gB1pMkVj4X+vUOPKZxX+u3uT0SsZTZxw5UUGMnxnrUn0coyzSr7MOZWk3l/150Uu5Z7xuJf/iLVMN+fZoHD2tpA48P719IJqv2qokvapWrViDMZhv6lEKhf4dyExyReKnwdbdRKAB4uTChywFClp2h173u5kEEKMVlDqH0CwempMn1EhOnrNBk0FCdNZXIiPmryWx5DsU4Y/XDf5s7pX68ArCdKWOn0XBtHEX0jjgsRfnFNIgJlX+/f9kBtnKGFv511DDvYPb/A5gKbxdZMIK4Tleg6CskTeRY7gOO7UCjNBSKFbrqjEVw3i1dI4X5dn9Cu1FrtRrpwJcoaFPhXcyjf2WRX3O7Qlr7XBbjx4nXSTDC/h9v89SdWroXiRZzCOm5NwoJio2yCJXj3G2le/dzefnnTQJxpQ6t4A2DP1NSplMiLLEq5bk++URwVjikVWHCJHsqVLvljhhlHTaFBXDpQavOdn+9trCuw668ch6cRpjAAasRWW3Y6xFZK9I/hZh6jDoV9FqlFTPrwjl9Ma/RjSjB44Kw5eay9M4ZbJmH9Lgz2251v/zqDIW1qU+v6zmArxoJ5+CYb/nfmcWQphjBHKg/XQdwGbNEL"
 
         Public Sub New()
             GetApiContext()
@@ -58,7 +57,7 @@ Namespace eBayApiLibrary
             Try
                 Dim item As ItemType = BuildItem(binr, CategoryId, SubCategoryId, title, description, price, zoom, ItemLocationCity, ItemLocationCountry)
 
-                SetApiContextCredentials(ebayAuthToken)
+                'SetApiContextCredentials(ebayAuthToken)
 
                 Dim apiCall As AddFixedPriceItemCall = New AddFixedPriceItemCall(apiContext)
                 Dim fees As FeeTypeCollection = apiCall.AddFixedPriceItem(item)
@@ -92,7 +91,7 @@ Namespace eBayApiLibrary
                 Dim item As ItemType = BuildItem(binr, CategoryId, SubCategoryId, title, description, price, zoom, ItemLocationCity, ItemLocationCountry)
                 item.ItemID = eBayProductId
 
-                SetApiContextCredentials(ebayAuthToken)
+                'SetApiContextCredentials(ebayAuthToken)
 
                 Dim apiCall As ReviseFixedPriceItemCall = New ReviseFixedPriceItemCall(apiContext)
 
@@ -105,13 +104,16 @@ Namespace eBayApiLibrary
                 databaseAccess.UpdateRevisedListingResults(binr)
             Catch ex As Exception
                 Console.WriteLine("Failed to update item : " + ex.Message)
+
+                Dim databaseAccess As New DatabaseAccess
+                databaseAccess.UpdateListingError(binr, ex.Message)
             End Try
 
         End Sub
 
         Public Sub EndItem(eBayProductId As String, ebayAuthToken As String)
             Try
-                SetApiContextCredentials(ebayAuthToken)
+                'SetApiContextCredentials(ebayAuthToken)
 
                 Dim apicall As EndItemCall = New EndItemCall(apiContext)
                 apicall.EndItem(eBayProductId, EndReasonCodeType.NotAvailable)
@@ -129,50 +131,52 @@ Namespace eBayApiLibrary
             End If
 
             Dim item As ItemType = New ItemType With {
-            .Title = title,
-            .Description = description,
-            .BuyerGuaranteePrice = NewAmount(price),
-            .StartPrice = NewAmount(price),
-            .ListingType = ListingTypeCodeType.FixedPriceItem,
-            .Currency = CurrencyCodeType.USD,
-            .ListingDuration = "GTC",
-            .Location = ItemLocationCity
-        }
+                .Title = title,
+                .Description = description,
+                .BuyerGuaranteePrice = NewAmount(price),
+                .StartPrice = NewAmount(price),
+                .ListingType = ListingTypeCodeType.FixedPriceItem,
+                .Currency = CurrencyCodeType.USD,
+                .ListingDuration = "GTC",
+                .Location = ItemLocationCity
+            }
 
             Dim CountryCodeTranslator As CountryCodePolicy = New CountryCodePolicy
             item.Country = CountryCodeTranslator.TranslateCountryCodeToId(ItemLocationCountry)
 
             Dim category As CategoryType = New CategoryType With {
-            .CategoryID = CategoryId.ToString
-        }
+                .CategoryID = CategoryId.ToString
+            }
 
             item.PrimaryCategory = category
 
             If Not SubCategoryId = 0 Then
                 Dim subCategory As CategoryType = New CategoryType With {
-                .CategoryID = SubCategoryId.ToString
-            }
+                    .CategoryID = SubCategoryId.ToString
+                }
+
                 item.SecondaryCategory = subCategory
             End If
 
             item.PaymentMethods = New BuyerPaymentMethodCodeTypeCollection From {
-            BuyerPaymentMethodCodeType.PayPal
-        }
+                BuyerPaymentMethodCodeType.PayPal
+            }
+
             item.PayPalEmailAddress = "me@paypal.com"
 
             item.DispatchTimeMax = 1
             item.ShippingDetails = BuildShippingDetails()
 
             item.ReturnPolicy = New ReturnPolicyType With {
-            .ReturnsAcceptedOption = "ReturnsAccepted",
-            .ReturnsWithin = 30
-        }
+                .ReturnsAcceptedOption = "ReturnsAccepted",
+                .ReturnsWithin = 30
+            }
 
             item.PictureDetails = New PictureDetailsType With {
-            .PhotoDisplaySpecified = True,
-            .PhotoDisplay = PhotoDisplayCodeType.None,
-            .PictureURL = New StringCollection()
-        }
+                .PhotoDisplaySpecified = True,
+                .PhotoDisplay = PhotoDisplayCodeType.None,
+                .PictureURL = New StringCollection()
+            }
 
             If zoom = True Then
                 item.PictureDetails.PictureURL.Add("https://www.antikvitet.net/images/apzoom/" & binr & "z.jpg")
@@ -216,25 +220,40 @@ Namespace eBayApiLibrary
             }
 
             'shippingOptions.ShippingInsuranceCost = NewAmount(1)
+            Dim shippingOptionsInternational As InternationalShippingServiceOptionsType = New InternationalShippingServiceOptionsType With {
+                .ShippingService = ShippingServiceCodeType.FedExInternationalEconomy.ToString(),
+                .ShippingServiceCost = NewAmount(0),
+                .ShippingServicePriority = 1,
+                .ShipToLocation = New StringCollection From {
+                    "Worldwide"
+                }
+            }
+
             Dim shippingOptionsWorldwide As ShippingServiceOptionsType = New ShippingServiceOptionsType With {
-            .ShippingService = ShippingServiceCodeType.ShippingMethodStandard.ToString(),
-            .ShippingServiceCost = NewAmount(30),
-            .ShippingServicePriority = 1,
-            .LocalPickupSpecified = True,
-            .LocalPickup = True
-        }
+                .ShippingService = ShippingServiceCodeType.ShippingMethodStandard.ToString(),
+                .ShippingServiceCost = NewAmount(0),
+                .FreeShipping = True,
+                .FreeShippingSpecified = True,
+                .ShippingServicePriority = 2,
+                .LocalPickupSpecified = True,
+                .LocalPickup = True
+            }
 
             Dim shippingOptionsLocalPickup As ShippingServiceOptionsType = New ShippingServiceOptionsType With {
-            .ShippingService = ShippingServiceCodeType.Pickup.ToString(),
-            .ShippingServiceCost = NewAmount(0),
-            .LocalPickupSpecified = True,
-            .LocalPickup = True
-        }
+                .ShippingService = ShippingServiceCodeType.Pickup.ToString(),
+                .ShippingServiceCost = NewAmount(0),
+                .LocalPickupSpecified = True,
+                .LocalPickup = True
+            }
 
             shippingDetails.ShippingServiceOptions = New ShippingServiceOptionsTypeCollection From {
-            shippingOptionsWorldwide,
-            shippingOptionsLocalPickup
-        }
+                shippingOptionsLocalPickup,
+                shippingOptionsWorldwide
+            }
+
+            shippingDetails.InternationalShippingServiceOption = New InternationalShippingServiceOptionsTypeCollection From {
+                shippingOptionsInternational
+            }
 
             Return shippingDetails
         End Function
@@ -366,7 +385,7 @@ Namespace eBayApiLibrary
             apiCredential.eBayToken = ebayAuthToken
 
             apiContext = New ApiContext With {
-                .SoapApiServerUrl = ApiServerUrl,
+                .SoapApiServerUrl = ApiServerUrl(),
                 .ApiCredential = apiCredential,
                 .Site = SiteCodeType.US,
                 .ApiLogManager = New ApiLogManager
@@ -379,12 +398,21 @@ Namespace eBayApiLibrary
             Return apiContext
         End Function
 
-        Private Sub SetApiContextCredentials(eBayToken As String)
+        Private Sub SetApiContextCredentials(ebayAuthToken As String)
             Dim apiCredential As ApiCredential = New ApiCredential
 
             apiCredential.eBayToken = ebayAuthToken
             apiContext.ApiCredential = apiCredential
+            apiContext.SoapApiServerUrl = ApiServerUrl()
         End Sub
+
+        Private Function ApiServerUrl() As String
+            If IsProduction() Then
+                Return "https://api.ebay.com/wsapi"
+            Else
+                Return "https://api.sandbox.ebay.com/wsapi"
+            End If
+        End Function
 
         Public Function IsProduction() As Boolean
             Dim appSettings As System.Collections.Specialized.NameValueCollection = System.Configuration.ConfigurationManager.AppSettings
